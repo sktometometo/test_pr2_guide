@@ -1,0 +1,3 @@
+pr2_guide/Spot spot
+---
+std_msgs/Bool return
