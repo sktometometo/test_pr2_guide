@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="pr2_guide" type="go-to-spot.l" name="/pr2_guide/go_to_spot" />
+    <node pkg="pr2_guide" type="pr2-guide.py" name="/pr2_guide/pr2_guide" />
+</launch>

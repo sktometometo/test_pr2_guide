@@ -1,0 +1,3 @@
+ apps:
+ - app: pr2-guide/pr2-guide
+   display: guide

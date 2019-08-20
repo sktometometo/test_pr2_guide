@@ -1,0 +1,260 @@
+data: [
+  { 
+    name: "ElevatorHall",
+    frame_id: "/eng2_7f"
+    pose:
+      position:
+        x:
+        y:
+        z:
+      orientation:
+        x:
+        y:
+        z:
+        w:
+    aliases: [ "エレベータホール", "エレベーター" ],
+    children: [],
+  },
+  {
+    name: "73A1",
+    frame_id: "/eng2_7f"
+    pose:
+      position:
+        x:
+        y:
+        z:
+      orientation:
+        x:
+        y:
+        z:
+        w:
+    aliases: [ "73A1", "稲葉先生", "稲葉先生の部屋" ],
+    children: [],
+  },
+  {
+    name: "73A2",
+    frame_id: "/eng2_7f"
+    pose:
+      position:
+        x:
+        y:
+        z:
+      orientation:
+        x:
+        y:
+        z:
+        w:
+    aliases: [ "73A2", "岡田先生", "岡田先生の部屋" ],
+    children: [],
+  },
+  {
+    name: "73A3",
+    frame_id: "/eng2_7f"
+    pose:
+      position:
+        x:
+        y:
+        z:
+      orientation:
+        x:
+        y:
+        z:
+        w:
+    aliases: [ "73A3" ],
+    children: [],
+  },
+  {
+    name: "73A4",
+    frame_id: "/eng2_7f"
+    pose:
+      position:
+        x:
+        y:
+        z:
+      orientation:
+        x:
+        y:
+        z:
+        w:
+    aliases: [ "73A4" ],
+    children: [],
+  },
+  {
+    name: "73B1",
+    frame_id: "/eng2_7f"
+    pose:
+      position:
+        x:
+        y:
+        z:
+      orientation:
+        x:
+        y:
+        z:
+        w:
+    aliases: [ "73B1", "" ],
+    children: [
+    ],
+  },
+  {
+    name: "73b2",
+    frame_id: "/eng2_7f"
+    pose:
+      position:
+        x:
+        y:
+        z:
+      orientation:
+        x:
+        y:
+        z:
+        w:
+    aliases: [ "73b2" ],
+    children: [
+      {
+        name: "affonso",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "アッフォンソ", "ギガ" ],
+        children: [],
+      },
+      {
+        name: "uchimi",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "内海", "うちみ" ],
+        children: [],
+      },
+      {
+        name: "yamaguchi",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "山口", "やまぐち" ],
+        children: [],
+      },
+      {
+        name: "otsubo",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "大坪", "おおつぼ" ],
+        children: [],
+      },
+      {
+        name: "shinjo",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "新城", "しんじょう" ],
+        children: [],
+      },
+      { 
+        name: "ishida",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "石田", "いしだ" ],
+        children: []
+      },
+      { 
+        name: "Baxter",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "バクスター" ],
+        children: [],
+      },
+      { 
+        name: "HRP2",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "HRP2" ],
+        children: []
+      },
+      { 
+        name: "Door",
+        frame_id: "/eng2_7f"
+        pose:
+          position:
+            x:
+            y:
+            z:
+          orientation:
+            x:
+            y:
+            z:
+            w:
+        aliases: [ "ドア" ],
+        children: []
+      },
+    ],
+  },
+],

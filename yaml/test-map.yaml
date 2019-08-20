@@ -1,0 +1,120 @@
+data:
+  {
+    name: "root",
+    text: "/",
+    aliases: [ "ルート"],
+    children: [
+      {
+        name: "2号館",
+        text: "/eng2",
+        aliases: [ "2号館" ],
+        children: [
+          {
+            name: "7F",
+            text: "/eng2/7f",
+            aliases: [ "7階" ],
+            children: [
+              { 
+                name: "ElevatorHall",
+                text: "/eng2/7f/elevator_call_panel-front",
+                aliases: [ "エレベータホール", "エレベーター" ],
+                children: [],
+              },
+              {
+                name: "73A1",
+                text: "/eng2/7f/room73A1-front",
+                aliases: [ "73A1", "稲葉先生", "稲葉先生の部屋" ],
+                children: [],
+              },
+              {
+                name: "73A2",
+                text: "/eng2/7f/room73A2-front",
+                aliases: [ "73A2", "岡田先生", "岡田先生の部屋" ],
+                children: [],
+              },
+              {
+                name: "73A3",
+                text: "/eng2/7f/room73A3-front",
+                aliases: [ "73A3" ],
+                children: [],
+              },
+              {
+                name: "73A4",
+                text: "/eng2/7f/room73A4-front",
+                aliases: [ "73A4" ],
+                children: [],
+              },
+              {
+                name: "73B1",
+                text: "/eng2/7f/room73B1-front",
+                aliases: [ "73B1", "" ],
+                children: [
+                ],
+              },
+              {
+                name: "73b2",
+                text: "/eng2/7f/room73b2",
+                aliases: [ "73b2" ],
+                children: [
+                  {
+                    name: "affonso",
+                    text: "",
+                    aliases: [ "アッフォンソ", "ギガ" ],
+                    children: [],
+                  },
+                  {
+                    name: "uchimi",
+                    text: "",
+                    aliases: [ "内海", "うちみ" ],
+                    children: [],
+                  },
+                  {
+                    name: "yamaguchi",
+                    text: "",
+                    aliases: [ "山口", "やまぐち" ],
+                    children: [],
+                  },
+                  {
+                    name: "otsubo",
+                    text: "",
+                    aliases: [ "大坪", "おおつぼ" ],
+                    children: [],
+                  },
+                  {
+                    name: "shinjo",
+                    text: "",
+                    aliases: [ "新城", "しんじょう" ],
+                    children: [],
+                  },
+                  { 
+                    name: "ishida",
+                    text: "/eng2/7f/room73b2-ishida",
+                    aliases: [ "石田", "いしだ" ],
+                    children: []
+                  },
+                  { 
+                    name: "Baxter",
+                    text: "/eng2/7f/room73b2-baxter",
+                    aliases: [ "バクスター" ],
+                    children: [],
+                  },
+                  { 
+                    name: "HRP2",
+                    text: "/eng2/7f/room73b2-hrp2",
+                    aliases: [ "HRP2" ],
+                    children: []
+                  },
+                  { 
+                    name: "Door",
+                    text: "/eng2/7f/room73b2-door-front",
+                    aliases: [ "ドア" ],
+                    children: []
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }
