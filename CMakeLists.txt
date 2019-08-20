@@ -15,6 +15,7 @@ add_service_files(
     SpotServer_AddSpot.srv
     SpotServer_DeleteSpot.srv
     SpotServer_GetSpots.srv
+    SpotServer_SaveFile.srv
 )
 
 add_message_files(
