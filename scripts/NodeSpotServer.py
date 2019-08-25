@@ -27,8 +27,13 @@ class SpotServer:
         else:
             self.filepath = filepath
 
-            if os.path.exits( filepath ):
-                self.load_spotlist( filepath )
+        if os.path.exits( self.filepath ):
+            self.load_spotlist( self.filepath )
+
+    def __del__( self ):
+        """
+        """
+        self.save_spotlist( self.filepath )
 
     def update_id( self ):
         for index, spot in self.spotlist:
@@ -61,7 +66,10 @@ class SpotServer:
 
 def main():
     
-    ss = SpotServer( os.path.abspath( sys.argv[1] ) )
+    if len( sys.argv ) > 1:
+        ss = SpotServer( os.path.abspath( sys.argv[1] ) )
+    else:
+        ss = SpotServer()
     rospy.spin()
 
 if __name__ == "__main__":

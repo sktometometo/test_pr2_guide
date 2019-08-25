@@ -10,33 +10,6 @@
 (defun str2symbol (str)
     (intern (string-upcase str) "KEYWORD"))
 
-(defun go-to-spot (spotname)
-    (let ((goal-pose nil)
-          (frame-id nil)
-          (spots nil))
-        (setq spots (one-shot))
-
-        (dolist (x spots)
-            (if (equal (send x :text) spotname)
-                (progn
-                    (setq goal-pose (send x :pose))
-                    (setq frame-id (send (send x :header) :frame_id))
-                    (return))
-                nil)
-            )
-        (if (equal goal-pose nil)
-            (progn
-                nil
-                )
-            (progn
-                (send (send goal-pose :position) :z 0)
-                (setq goal-pose (ros::tf-pose->coords goal-pose))
-                (send *ri* :move-to goal-pose :frame-id frame-id)
-                t
-                )
-            )
-        )
-    )
 
 (defclass pr2-guide-status-based-action
     :slots ((status "default")
@@ -106,22 +79,30 @@
         )
 
     (:actionhandler-waiting ()
+        (if (send self :call-interactionmodule-waiting)
+            (send self :set-action-status "waiting-interaction")
+            nil)
         )
 
     (:actionhandler-waiting-interaction ()
+        (let* ((ret (send self :call-interactionmodule-waiting-interaction)))
+            (cond ((ret "waiting")
+                    (send self :set-action-status "waiting")
+                    )
+                  ((ret "waiting-interaction")
+                    nil
+                    )
+                  ((ret "guiding")
+                    (send self :set-action-status "guiding")
+                    (send self :target-spotname hoge)
+                    )
+                  )
         )
 
     (:actionhandler-guiding ()
-        (cond 
-            ((= (send self :get-action-status) "waiting-interaction")
-                (send self :set-val `target-spotname (elt (send self :get-val `arg-str-list) 0))
-                (go-to-spot (send self :get-val `target-spotname))
-                )
-            ((= (send self :get-action-status) "guiding-halt-interaction")
-                (go-to-spot (elt (send self :get-val `arg-str-list) 0))
-                )
-            (t
-                )
+        (let* ()
+            ;; saying something
+            (go-to-spot (send self :get-val `target-spotname))
             )
         )
 
