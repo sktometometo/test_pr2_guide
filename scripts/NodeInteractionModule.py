@@ -14,11 +14,13 @@ import dialogflow_v2 as dialogflow
 
 import threading
 
+
 class InteractionModule
 
     def __init__( self, 
                   dialogflow_project_id, 
                   dialogflow_session_id,
+                  credential_file,
                   language_code = "ja" ):
         
         # all member methods
@@ -35,6 +37,10 @@ class InteractionModule
         self.statushandlerthread = None
         self.isok = False
         self.sttbuffer = []
+        self.credential_file = credential_file
+
+        # os enviromental variable
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.abspath( credential_file )
 
         # dialog flow
         self.df_sessionclient = dialogflow.SessionClient()
@@ -262,7 +268,85 @@ class InteractionModule
 
     def statushandler_guiding_halt_waiting( self ):
 
+        bufstr = ""
+
+        while self.isok and len( self.sttbuffer ) > 0:
+
+            bufstr = self.sttbuffer[0]
+            del self.sttbuffer[0]
+            ret = self.sendQuery( bufstr )
+            intent_name = ret.query_result.intent.display_name
+            fulfillment_text = str(ret.query_result.fulfillment_text)
+
+            if intent_name == "Default Fallback Intent":
+                self.speakInJapanese( fulfillment_text )
+                # DO NOTHING
+
+            elif intent_name == "Default Welcome Intent":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "command : halt":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "guiding_halt_interaction" )
+
+            elif intent_name == "command : abort":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "waiting" )
+
+            elif intent_name == "command : resume":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "guiding : start : people":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "guiding : start : place":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            else:
+                self.speakInJapanese( fulfillment_text )
+                self.speakInJapanese( "未知のインテントが返ってきています。" )
+                # TODO : 詳細な場合分け
+
     def statushandler_guiding_halt_interaction( self ):
+
+        bufstr = ""
+
+        while self.isok and len( self.sttbuffer ) > 0:
+
+            bufstr = self.sttbuffer[0]
+            del self.sttbuffer[0]
+            ret = self.sendQuery( bufstr )
+            intent_name = ret.query_result.intent.display_name
+            fulfillment_text = str(ret.query_result.fulfillment_text)
+
+            if intent_name == "Default Fallback Intent":
+                self.speakInJapanese( fulfillment_text )
+                # DO NOTHING
+
+            elif intent_name == "Default Welcome Intent":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "command : halt":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "guiding_halt_interaction" )
+
+            elif intent_name == "command : abort":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "waiting" )
+
+            elif intent_name == "command : resume":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "guiding : start : people":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "guiding : start : place":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            else:
+                self.speakInJapanese( fulfillment_text )
+                self.speakInJapanese( "未知のインテントが返ってきています。" )
+                # TODO : 詳細な場合分け
 
     def sendQuery( self, text ):
         text_input  = dialogflow.types.TextInput( text=text, language_code=self.language_code )
@@ -275,3 +359,7 @@ class InteractionModule
         """
         #TBD
         
+if __name__=="__main__":
+
+    im = InteractionModule( sys.argv[1], sys.argv[2], sys.argv[3] )
+    rospy.spin()
