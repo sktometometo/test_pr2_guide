@@ -51,6 +51,7 @@ class InteractionModule
         """
         """
         self.sttbuffer.append( msg.transcript[0] )
+        self.isok = True
 
     def callback_status( self, msg ):
         """
@@ -64,11 +65,11 @@ class InteractionModule
             self.statushandlerthread.start()
             self.statushandlerthread.detach()
 
-    def setStatus( self ):
+    def setStatus( self, status ):
 
         setStatusService = rospy.ServiceProxy( "/StatusManager/Service/set_Status", StatusManagerService_SetStatus )
-        ret = setStatusService( StatusManagerService_SetStatusRequest( "" ) )
-        
+        ret = setStatusService( StatusManagerService_SetStatusRequest( status ) )
+        return ret.ret
 
     def servicehandler_stop( self, req ):
         """
@@ -76,6 +77,8 @@ class InteractionModule
         self.isok = False
 
     def statushandler_default( self ):
+
+        self.isok = False
 
     def statushandler_waiting( self ):
 
@@ -91,9 +94,36 @@ class InteractionModule
             # TODO: ret の 状態から,waiting_interaction もしくは guiding へ
             #
             if hogehoge:
+                
+                self.setStatus( "waiting_interaction" )
+
+            elif fugafuga:
+
+                self.setStatus( "guiding" )
+
+        self.isok = False
 
 
     def statushandler_waiting_interaction( self ):
+
+        bufstr = ""
+
+        while self.isok and len( self.sttbuffer ) > 0:
+
+            bufstr = self.sttbuffer[0]
+            del self.sttbuffer[0]
+            ret = self.sendQuery( bufstr )
+
+            #
+            # TODO : retの内容に応じて返す内容を買える
+            #
+
+
+            if hogehoge:
+
+                self.setStatus( "guiding" )
+
+        self.isok = False
 
     def statushandler_guiding( self ):
 
