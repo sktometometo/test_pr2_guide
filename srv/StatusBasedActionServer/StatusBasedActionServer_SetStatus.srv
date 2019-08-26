@@ -1,4 +1,0 @@
-std_msgs/String status
-std_msgs/String[] args
----
-std_msgs/Bool ret

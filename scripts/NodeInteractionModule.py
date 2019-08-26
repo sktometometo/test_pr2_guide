@@ -53,22 +53,66 @@ class InteractionModule
         self.sttbuffer.append( msg.transcript[0] )
         self.isok = True
 
+        if not self.isaliveStatusHandler():
+            self.startStatusHandler()
+
     def callback_status( self, msg ):
         """
         """
         #
+        if self.isaliveStatusHandler():
+            self.stopStatusHandler()
+        #
         self.status = msg.data
         self.isok = True
-        #
+        self.startStatusHandler()
+
+    def isaliveStatusHandler( self ):
+        """
+        """
+        if self.statushandlerthread is None:
+            return False
+        else:
+            return self.statushandlerthread.is_alive():
+
+    def startStatusHandler( self ):
+        """
+        """
         if self.status in self.statushandlers.keys():
             self.statushandlerthread = threading.Thread( target = self.statushandlers[ self.status ] )
             self.statushandlerthread.start()
             self.statushandlerthread.detach()
+            return True
+        else:
+            return False
+
+    def stopStatusHandler( self, timeout=10.0 ):
+
+        if self.isaliveStatusHandler():
+            self.isok = False
+            self.statushandlerthread.join( timeout=timeout )
+            if self.statushandlerthread.is_alive():
+                self.isok = True
+                return False
+            else:
+                return True
+        else:
+            return True
 
     def setStatus( self, status ):
 
         setStatusService = rospy.ServiceProxy( "/StatusManager/Service/set_Status", StatusManagerService_SetStatus )
         ret = setStatusService( StatusManagerService_SetStatusRequest( status ) )
+        return ret.ret
+
+    def callGoToSpotStart( self, target_spot ):
+        gotospotStart = rospy.ServiceProxy( "/go_to_spot_server/start_go_to_spot", GoToSpotServiceStart )
+        ret = setStatusService( GoToSpotServiceStartRequest( target_spot ) )
+        return ret.ret
+
+    def callGoToSpotCancel( self ):
+        gotospotCancel = rospy.ServiceProxy( "/go_to_spot_server/cancel_go_to_spot", GoToSpotServiceCancel )
+        ret = setStatusService( GoToSpotServiceCancelRequest( ) )
         return ret.ret
 
     def servicehandler_stop( self, req ):
@@ -89,20 +133,41 @@ class InteractionModule
             bufstr = self.sttbuffer[0]
             del self.sttbuffer[0]
             ret = self.sendQuery( bufstr )
+            intent_name = ret.query_result.intent.display_name
+            fulfillment_text = str(ret.query_result.fulfillment_text)
 
-            #
-            # TODO: ret の 状態から,waiting_interaction もしくは guiding へ
-            #
-            if hogehoge:
-                
+            if intent_name == "Default Fallback Intent":
+                self.speakInJapanese( fulfillment_text )
+                # DO NOTHING
+
+            elif intent_name == "Default Welcome Intent":
+                self.speakInJapanese( fulfillment_text )
                 self.setStatus( "waiting_interaction" )
 
-            elif fugafuga:
+            elif intent_name == "command : halt":
 
+            elif intent_name == "command : abort":
+
+            elif intent_name == "command : resume":
+
+            elif intent_name == "command : guide_start_people":
+                self.speakInJapanese( fulfillment_text )
+                target_spot = ret.query_result.parameters["Person"]
                 self.setStatus( "guiding" )
+                callGoToSpotStart( target_spot )
+
+            elif intent_name == "command : guide_start_place":
+                self.speakInJapanese( fulfillment_text )
+                target_spot = ret.query_result.parameters["Place"]
+                self.setStatus( "guiding" )
+                callGoToSpotStart( target_spot )
+
+            else:
+                self.speakInJapanese( fulfillment_text )
+                self.speakInJapanese( "未知のインテントが返ってきています。" )
+                # TODO : 詳細な場合分け
 
         self.isok = False
-
 
     def statushandler_waiting_interaction( self ):
 
@@ -113,19 +178,87 @@ class InteractionModule
             bufstr = self.sttbuffer[0]
             del self.sttbuffer[0]
             ret = self.sendQuery( bufstr )
+            intent_name = ret.query_result.intent.display_name
+            fulfillment_text = str(ret.query_result.fulfillment_text)
 
-            #
-            # TODO : retの内容に応じて返す内容を買える
-            #
+            if intent_name == "Default Fallback Intent":
+                self.speakInJapanese( fulfillment_text )
+                # DO NOTHING
 
+            elif intent_name == "Default Welcome Intent":
+                self.speakInJapanese( fulfillment_text )
 
-            if hogehoge:
+            elif intent_name == "command : halt":
+                self.speakInJapanese( "待機モードに移行します。" )
+                self.setStatus( "waiting" )
 
+            elif intent_name == "command : abort":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "waiting" )
+
+            elif intent_name == "command : resume":
+
+            elif intent_name == "command : guide_start_people":
+                self.speakInJapanese( fulfillment_text )
+                target_spot = ret.query_result.parameters["Person"]
                 self.setStatus( "guiding" )
+                callGoToSpotStart( target_spot )
+
+            elif intent_name == "command : guide_start_place":
+                self.speakInJapanese( fulfillment_text )
+                target_spot = ret.query_result.parameters["Place"]
+                self.setStatus( "guiding" )
+                callGoToSpotStart( target_spot )
+
+            else:
+                self.speakInJapanese( fulfillment_text )
+                self.speakInJapanese( "未知のインテントが返ってきています。" )
+                # TODO : 詳細な場合分け
 
         self.isok = False
 
     def statushandler_guiding( self ):
+
+        bufstr = ""
+
+        while self.isok and len( self.sttbuffer ) > 0:
+
+            bufstr = self.sttbuffer[0]
+            del self.sttbuffer[0]
+            ret = self.sendQuery( bufstr )
+            intent_name = ret.query_result.intent.display_name
+            fulfillment_text = str(ret.query_result.fulfillment_text)
+
+            if intent_name == "Default Fallback Intent":
+                self.speakInJapanese( fulfillment_text )
+                # DO NOTHING
+
+            elif intent_name == "Default Welcome Intent":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "command : halt":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "guiding_halt_interaction" )
+
+            elif intent_name == "command : abort":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "waiting" )
+
+            elif intent_name == "command : resume":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "guiding : start : people":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            elif intent_name == "guiding : start : place":
+                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
+
+            else:
+                self.speakInJapanese( fulfillment_text )
+                self.speakInJapanese( "未知のインテントが返ってきています。" )
+                # TODO : 詳細な場合分け
+
+        self.isok = False
 
     def statushandler_guiding_halt_waiting( self ):
 
