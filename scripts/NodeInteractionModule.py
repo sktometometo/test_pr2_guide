@@ -20,10 +20,21 @@ class InteractionModule
                   dialogflow_project_id, 
                   dialogflow_session_id,
                   credential_file,
+                  nodename = "interaction_module",
+                  topicname_status_manager_status = "/status_manager/status",
+                  topicname_speech_to_text = "/speech_to_text",
+                  servicename_status_manager_set_status = "/status_manager/set_status",
+                  servicename_go_to_spot_start = "/go_to_spot/start",
+                  servicename_go_to_spot_cancel = "/go_to_spot/cancel",
                   language_code = "ja" ):
         
-        # all member methods
-        self.language_code = ""
+        # member variables initialization for dialog flow
+        self.language_code = language_code
+        self.credential_file = credential_file
+        self.dialogflow_project_id = dialogflow_project_id
+        self.dialogflow_session_id = dialogflow_session_id
+
+        # member variables initialization for status management
         self.status = "default"
         self.statushandlers = {
                                 "default":                  self.statushandler_default,
@@ -35,54 +46,49 @@ class InteractionModule
                               }
         self.statushandlerthread = None
         self.isok = False
-        self.sttbuffer = []
-        self.credential_file = credential_file
-
-        # os enviromental variable
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.abspath( credential_file )
+        self.buffer_text = []
+        self.target_spot_stack = []
 
         # dialog flow
+        ## os enviromental variable
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.abspath( self.credential_file )
+        ## initialization for dialogflow
         self.df_sessionclient = dialogflow.SessionClient()
-        self.df_session       = self.df_sessionclient.session_path( dialogflow_project_id, dialogflow_session_id )
-        self.language_code = language_code
+        self.df_session       = self.df_sessionclient.session_path( self.dialogflow_project_id, self.dialogflow_session_id )
 
         # ROS
-        rospy.init_node( "InteractionModule" )
-        self.rosservice_stop         = rospy.Service( "/interactionmodule/stop",          InteractionModuleServer_Stop,         self.servicehandler_stop )
-        self.rossubscriber_status = rospy.Subscriber( "/StatusManager/Status", String, self.callback_status )
-        self.rossubscriber_stt = rospy.Subscriber( "/speech_to_text", SpeechRecognitionCandidates, self.callback_stt )
+        ##
+        self.nodename = nodename
+        self.topicname_status_manager_status = topicname_status_manager_status
+        self.topicname_speech_to_text = topicname_speech_to_text
+        self.servicename_status_manager_set_status = servicename_status_manager_set_status
+        self.servicename_go_to_spot_start = servicename_go_to_spot_start
+        self.servicename_go_to_spot_cancel = servicename_go_to_spot_cancel
+        ##
+        rospy.init_node( self.nodename )
+        self.subscriber_status = rospy.Subscriber( self.topicname_status_manager_status, 
+                                                   String,
+                                                   self.subscribercallback_status )
+        self.subscriber_speech_to_text = rospy.Subscriber( self.topicname_speech_to_text, 
+                                                           SpeechRecognitionCandidates, 
+                                                           self.subscribercallback_speech_to_text )
 
-    def callback_stt( self, msg ):
-        """
-        """
-        self.sttbuffer.append( msg.transcript[0] )
-        self.isok = True
+    def sendQuery( self, text ):
+        text_input  = dialogflow.types.TextInput( text=text, language_code=self.language_code )
+        query_input = dialogflow.types.QueryInput( text=text_input )
+        response    = self.df_sessionclient.detect_intent( session=session, query_input=query_input )
+        return response
 
-        if not self.isaliveStatusHandler():
-            self.startStatusHandler()
-
-    def callback_status( self, msg ):
-        """
-        """
-        #
-        if self.isaliveStatusHandler():
-            self.stopStatusHandler()
-        #
-        self.status = msg.data
-        self.isok = True
-        self.startStatusHandler()
+    def speakInJapanese( self, text ):
+        #TBD
 
     def isaliveStatusHandler( self ):
-        """
-        """
         if self.statushandlerthread is None:
             return False
         else:
             return self.statushandlerthread.is_alive():
 
     def startStatusHandler( self ):
-        """
-        """
         if self.status in self.statushandlers.keys():
             self.statushandlerthread = threading.Thread( target = self.statushandlers[ self.status ] )
             self.statushandlerthread.start()
@@ -92,7 +98,6 @@ class InteractionModule
             return False
 
     def stopStatusHandler( self, timeout=10.0 ):
-
         if self.isaliveStatusHandler():
             self.isok = False
             self.statushandlerthread.join( timeout=timeout )
@@ -105,25 +110,35 @@ class InteractionModule
             return True
 
     def setStatus( self, status ):
-
-        setStatusService = rospy.ServiceProxy( "/StatusManager/Service/set_Status", StatusManagerService_SetStatus )
-        ret = setStatusService( StatusManagerService_SetStatusRequest( status ) )
+        setStatusService = rospy.ServiceProxy( self.servicename_status_manager_set_status, StatusManagerSetStatus )
+        ret = setStatusService( StatusManagerSetStatusRequest( status ) )
         return ret.ret
 
     def callGoToSpotStart( self, target_spot ):
-        gotospotStart = rospy.ServiceProxy( "/go_to_spot_server/start_go_to_spot", GoToSpotServiceStart )
-        ret = setStatusService( GoToSpotServiceStartRequest( target_spot ) )
+        gotospotStart = rospy.ServiceProxy( self.servicename_go_to_spot_start, GoToSpotStart )
+        ret = setStatusService( GoToSpotStartRequest( target_spot ) )
         return ret.ret
 
     def callGoToSpotCancel( self ):
-        gotospotCancel = rospy.ServiceProxy( "/go_to_spot_server/cancel_go_to_spot", GoToSpotServiceCancel )
-        ret = setStatusService( GoToSpotServiceCancelRequest( ) )
+        gotospotCancel = rospy.ServiceProxy( self.servicename_go_to_spot_cancel, GoToSpotCancel )
+        ret = setStatusService( GoToSpotCancelRequest( ) )
         return ret.ret
 
-    def servicehandler_stop( self, req ):
-        """
-        """
-        self.isok = False
+    def subscribercallback_speech_to_text( self, msg ):
+        self.buffer_text.append( msg.transcript[0] )
+        self.isok = True
+
+        if not self.isaliveStatusHandler():
+            self.startStatusHandler()
+
+    def subscribercallback_status( self, msg ):
+        #
+        if self.isaliveStatusHandler():
+            self.stopStatusHandler()
+        #
+        self.status = msg.data
+        self.isok = True
+        self.startStatusHandler()
 
     def statushandler_default( self ):
 
@@ -170,7 +185,6 @@ class InteractionModule
             else:
                 self.speakInJapanese( fulfillment_text )
                 self.speakInJapanese( "未知のインテントが返ってきています。" )
-                # TODO : 詳細な場合分け
 
         self.isok = False
 
@@ -218,7 +232,6 @@ class InteractionModule
             else:
                 self.speakInJapanese( fulfillment_text )
                 self.speakInJapanese( "未知のインテントが返ってきています。" )
-                # TODO : 詳細な場合分け
 
         self.isok = False
 
@@ -261,7 +274,6 @@ class InteractionModule
             else:
                 self.speakInJapanese( fulfillment_text )
                 self.speakInJapanese( "未知のインテントが返ってきています。" )
-                # TODO : 詳細な場合分け
 
         self.isok = False
 
@@ -304,7 +316,6 @@ class InteractionModule
             else:
                 self.speakInJapanese( fulfillment_text )
                 self.speakInJapanese( "未知のインテントが返ってきています。" )
-                # TODO : 詳細な場合分け
 
     def statushandler_guiding_halt_interaction( self ):
 
@@ -345,18 +356,6 @@ class InteractionModule
             else:
                 self.speakInJapanese( fulfillment_text )
                 self.speakInJapanese( "未知のインテントが返ってきています。" )
-                # TODO : 詳細な場合分け
-
-    def sendQuery( self, text ):
-        text_input  = dialogflow.types.TextInput( text=text, language_code=self.language_code )
-        query_input = dialogflow.types.QueryInput( text=text_input )
-        response    = self.df_sessionclient.detect_intent( session=session, query_input=query_input )
-        return response
-
-    def speakInJapanese( self, text ):
-        """
-        """
-        #TBD
         
 if __name__=="__main__":
 

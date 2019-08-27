@@ -10,7 +10,11 @@ from std_msgs.msg import *
 
 class StatusManager
 
-    def __init__( self ):
+    def __init__( self,
+                  nodename = "status_manager",
+                  servicename_status_manager_set_status = "/status_manager/set_status",
+                  topicname_status_manager_status = "/status_manager/status"
+                 ):
 
         #
         self.status = "default"
@@ -22,19 +26,21 @@ class StatusManager
                                 "guiding_halt_waiting":     self.statushandler_guiding_halt_waiting,
                                 "guiding_halt_interaction": self.statushandler_guiding_halt_interaction,
                               }
-
         self.statushandlerthread = None
+        self.nodename = nodename
+        self.servicename_status_manager_set_status = servicename_status_manager_set_status
+        self.topicname_status_manager_status = topicname_status_manager_status
         
         # ROS
-        rospy.init_node( "StatusManager" )
-        self.rosservice_setstatus = rospy.Service( "/StatusManager/Service/set_status", StatusManagerService_SetStatus, self.servicehandler_setstatus )
-        self.rospublisher_setstatus = rospy.Publisher( "/StatusManager/Status", String, queue_size=10 )
+        rospy.init_node( self.nodename )
+        self.service_setstatus = rospy.Service( self.servicename_status_manager_set_status, StatusManagerSetStatus, self.servicehandler_setstatus )
+        self.publisher_status = rospy.Publisher( self.topicname_status_manager_status, String, queue_size=10 )
 
     def servicehandler_setstatus( self, req ):
         """
         """
         self.setStatus( req.status )
-        return StatusManagerService_SetStatusResponse(True)
+        return StatusManagerSetStatusResponse( True )
 
     def setStatus( status ):
 
@@ -45,7 +51,7 @@ class StatusManager
             self.statushandlerthread.start()
             self.statushandlerthread.detach()
         #
-        self.rospublisher_setstatus.publish( self.status )
+        self.publisher_status.publish( self.status )
         
     def statushandler_default( self ):
 
