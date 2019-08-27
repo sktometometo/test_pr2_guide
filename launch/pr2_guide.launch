@@ -1,10 +1,24 @@
 <launch>
-    <param name="file_spotserver" value="$(file pr2_guide)/spotserver.pickle" />
+    <param name="/pr2_guide/filename/spot_manager/config"            value="$(find pr2_guide)/spotserver.pickle" />
+    <param name="/pr2_guide/filename/interaction_module/credential"  value="" />
+    <param name="/pr2_guide/config/interaction_module/project_id"    value="" />
+    <param name="/pr2_guide/config/interaction_module/session_id"    value="" />
+    <param name="/pr2_guide/config/interaction_module/language_code" value="ja" />
 
-    <node pkg="pr2_guide" type="node-go-to-spot.l" name="/pr2_guide/go_to_spot" />
+    <param name="/pr2_guide/topicname/status_manager/status"         value="/status_manager/status" />
+    <param name="/pr2_guide/servicename/go_to_spot/start"            value="/go_to_spot/start" />
+    <param name="/pr2_guide/servicename/go_to_spot/cancel"           value="/go_to_spot/cancel" />
+    <param name="/pr2_guide/servicename/spot_manager/add"            value="/spot_manager/add" />
+    <param name="/pr2_guide/servicename/spot_manager/delete"         value="/spot_manager/delete" />
+    <param name="/pr2_guide/servicename/spot_manager/get"            value="/spot_manager/get" />
+    <param name="/pr2_guide/servicename/spot_manager/save"           value="/spot_manager/save" />
+    <param name="/pr2_guide/servicename/status_manager/set_status"   value="/status_manager/set_status" />
 
-    <node pkg="pr2_guide" type="pr2-guide.py" name="/pr2_guide/pr2_guide" />
+    <param name="/pr2_guide/topicname/speech_to_text"                value="/speech_to_text" />
+    <param name="/pr2_guide/topicname/move_base/cancel"              value="/move_base/cancel" />
 
-    <node pkg="pr2_guide" type="spotserver.py" name="/pr2_guide/spotserver"
-        args="$(arg file_spotserver)" />
+    <node pkg="pr2_guide" type="node-go-to-spot.l"        name="/pr2_guide/go_to_spot" />
+    <node pkg="pr2_guide" type="NodeInteractionModule.py" name="/pr2_guide/interaction-module" />
+    <node pkg="pr2_guide" type="NodeSpotServer.py"        name="/pr2_guide/spot_manager" />
+    <node pkg="pr2_guide" type="NodeStatusManager.py"     name="/pr2_guide/status_manager" />
 </launch>

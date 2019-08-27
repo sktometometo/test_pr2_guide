@@ -10,11 +10,20 @@ from std_msgs.msg import *
 
 class StatusManager
 
-    def __init__( self,
-                  nodename = "status_manager",
-                  servicename_status_manager_set_status = "/status_manager/set_status",
-                  topicname_status_manager_status = "/status_manager/status"
-                 ):
+    def __init__( self ):
+
+        # ROS
+        ##
+        self.nodename = "status_manager"
+        rospy.init_node( self.nodename )
+        ##
+        self.servicename_status_manager_set_status = rospy.getparam( "/pr2_guide/servicename/status_manager/status",
+                                                                     "/status_manager/set_status" )
+        self.topicname_status_manager_status       = rospy.getparam( "/pr2_guide/topicname/status_manager/status",
+                                                                     "/status_manager/status" )
+        ##
+        self.service_setstatus = rospy.Service( self.servicename_status_manager_set_status, StatusManagerSetStatus, self.servicehandler_setstatus )
+        self.publisher_status = rospy.Publisher( self.topicname_status_manager_status, String, queue_size=10 )
 
         #
         self.status = "default"
@@ -27,14 +36,6 @@ class StatusManager
                                 "guiding_halt_interaction": self.statushandler_guiding_halt_interaction,
                               }
         self.statushandlerthread = None
-        self.nodename = nodename
-        self.servicename_status_manager_set_status = servicename_status_manager_set_status
-        self.topicname_status_manager_status = topicname_status_manager_status
-        
-        # ROS
-        rospy.init_node( self.nodename )
-        self.service_setstatus = rospy.Service( self.servicename_status_manager_set_status, StatusManagerSetStatus, self.servicehandler_setstatus )
-        self.publisher_status = rospy.Publisher( self.topicname_status_manager_status, String, queue_size=10 )
 
     def servicehandler_setstatus( self, req ):
         """

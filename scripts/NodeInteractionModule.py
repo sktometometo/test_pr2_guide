@@ -16,23 +16,36 @@ import threading
 
 class InteractionModule
 
-    def __init__( self, 
-                  dialogflow_project_id, 
-                  dialogflow_session_id,
-                  credential_file,
-                  nodename = "interaction_module",
-                  topicname_status_manager_status = "/status_manager/status",
-                  topicname_speech_to_text = "/speech_to_text",
-                  servicename_status_manager_set_status = "/status_manager/set_status",
-                  servicename_go_to_spot_start = "/go_to_spot/start",
-                  servicename_go_to_spot_cancel = "/go_to_spot/cancel",
-                  language_code = "ja" ):
+    def __init__( self ):
+        # ROS
+        ##
+        self.nodename                              = "interaction_module"
+        rospy.init_node( self.nodename )
+
+        ##
+        self.topicname_status_manager_status       = rospy.getparam( "/pr2_guide/topicname/status_manager/status",
+                                                                     "/status_manager/status" )
+        self.topicname_speech_to_text              = rospy.getparam( "/pr2_guide/topicname/speech_to_text",
+                                                                     "/speech_to_text" )
+        self.servicename_status_manager_set_status = rospy.getparam( "/pr2_guide/servicename/status_manager/set_status",
+                                                                     "/status_manager/set_status" )
+        self.servicename_go_to_spot_start          = rospy.getparam( "/pr2_guide/servicename/go_to_spot/start",
+                                                                     "/go_to_spot/start" )
+        self.servicename_go_to_spot_cancel         = rospy.getparam( "/pr2_guide/servicename/go_to_spot/cancel",
+                                                                     "/go_to_spot/cancel" )
+        ##
+        self.subscriber_status = rospy.Subscriber( self.topicname_status_manager_status, 
+                                                   String,
+                                                   self.subscribercallback_status )
+        self.subscriber_speech_to_text = rospy.Subscriber( self.topicname_speech_to_text, 
+                                                           SpeechRecognitionCandidates, 
+                                                           self.subscribercallback_speech_to_text )
         
         # member variables initialization for dialog flow
-        self.language_code = language_code
-        self.credential_file = credential_file
-        self.dialogflow_project_id = dialogflow_project_id
-        self.dialogflow_session_id = dialogflow_session_id
+        self.language_code         = rospy.getparam( "/pr2_guide/config/interaction_module/language_code" )
+        self.credential_file       = rospy.getparam( "/pr2_guide/filename/interaction_module/credential" )
+        self.dialogflow_project_id = rospy.getparam( "/pr2_guide/config/interaction_module/project_id" )
+        self.dialogflow_session_id = rospy.getparam( "/pr2_guide/config/interaction_module/session_id" )
 
         # member variables initialization for status management
         self.status = "default"
@@ -55,23 +68,6 @@ class InteractionModule
         ## initialization for dialogflow
         self.df_sessionclient = dialogflow.SessionClient()
         self.df_session       = self.df_sessionclient.session_path( self.dialogflow_project_id, self.dialogflow_session_id )
-
-        # ROS
-        ##
-        self.nodename = nodename
-        self.topicname_status_manager_status = topicname_status_manager_status
-        self.topicname_speech_to_text = topicname_speech_to_text
-        self.servicename_status_manager_set_status = servicename_status_manager_set_status
-        self.servicename_go_to_spot_start = servicename_go_to_spot_start
-        self.servicename_go_to_spot_cancel = servicename_go_to_spot_cancel
-        ##
-        rospy.init_node( self.nodename )
-        self.subscriber_status = rospy.Subscriber( self.topicname_status_manager_status, 
-                                                   String,
-                                                   self.subscribercallback_status )
-        self.subscriber_speech_to_text = rospy.Subscriber( self.topicname_speech_to_text, 
-                                                           SpeechRecognitionCandidates, 
-                                                           self.subscribercallback_speech_to_text )
 
     def sendQuery( self, text ):
         text_input  = dialogflow.types.TextInput( text=text, language_code=self.language_code )
