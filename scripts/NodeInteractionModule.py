@@ -14,7 +14,6 @@ import dialogflow_v2 as dialogflow
 
 import threading
 
-
 class InteractionModule
 
     def __init__( self, 

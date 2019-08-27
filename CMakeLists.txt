@@ -10,33 +10,22 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 add_service_files(
-    DIRECTORY srv/SpotServer
+    DIRECTORY srv
     FILES
-    SpotServer_AddSpot.srv
-    SpotServer_DeleteSpot.srv
-    SpotServer_GetSpots.srv
-    SpotServer_SaveFile.srv
+    GoToSpotCancel.srv
+    GoToSpotStart.srv
+    SpotManagerAdd.srv
+    SpotManagerDelete.srv
+    SpotManagerGet.srv
+    SpotManagerSave.srv
+    StatusManagerSetStatus.srv
 )
 
-add_service_files(
-    DIRECTORY srv/StatusBasedActionServer
-    FILES
-    StatusBasedActionServer_GetStatus.srv
-    StatusBasedActionServer_SetStatus.srv
-)
-
-add_service_files(
-    DIRECTORY srv/StatusBasedMotionServer
-    FILES
-    StatusBasedMotionServer_GetStatus.srv
-    StatusBasedMotionServer_SetStatus.srv
-)
 
 add_message_files(
-    DIRECTORY msg/Spot
+    DIRECTORY msg
     FILES 
     Spot.msg
-    SpotArray.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs geometry_msgs pr2_guide)
