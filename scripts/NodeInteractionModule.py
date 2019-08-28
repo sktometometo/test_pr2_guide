@@ -154,29 +154,28 @@ class InteractionModule
 
             if intent_name == "Default Fallback Intent":
                 self.speakInJapanese( fulfillment_text )
-                # DO NOTHING
 
             elif intent_name == "Default Welcome Intent":
                 self.speakInJapanese( fulfillment_text )
                 self.setStatus( "waiting_interaction" )
 
-            elif intent_name == "command : halt":
-
             elif intent_name == "command : abort":
+
+            elif intent_name == "command : add_spot":
+
+            elif intent_name == "command : delete_spot":
+
+            elif intent_name == "command : halt":
 
             elif intent_name == "command : resume":
 
-            elif intent_name == "command : guide_start_people":
-                self.speakInJapanese( fulfillment_text )
-                target_spot = ret.query_result.parameters["Person"]
-                self.setStatus( "guiding" )
-                callGoToSpotStart( target_spot )
-
-            elif intent_name == "command : guide_start_place":
-                self.speakInJapanese( fulfillment_text )
-                target_spot = ret.query_result.parameters["Place"]
-                self.setStatus( "guiding" )
-                callGoToSpotStart( target_spot )
+            elif intent_name == "command : start_guiding":
+                target_spot = ret.query_result.parameters["Spot"]
+                if callGoToSpotStart( target_spot ):
+                    self.speakInJapanese( fulfillment_text )
+                    self.setStatus( "guiding" )
+                else:
+                    self.speakInJapanese( target_spot + "への案内に失敗しました。" )
 
             else:
                 self.speakInJapanese( fulfillment_text )
@@ -198,32 +197,33 @@ class InteractionModule
 
             if intent_name == "Default Fallback Intent":
                 self.speakInJapanese( fulfillment_text )
-                # DO NOTHING
 
             elif intent_name == "Default Welcome Intent":
                 self.speakInJapanese( fulfillment_text )
-
-            elif intent_name == "command : halt":
-                self.speakInJapanese( "待機モードに移行します。" )
-                self.setStatus( "waiting" )
 
             elif intent_name == "command : abort":
                 self.speakInJapanese( fulfillment_text )
                 self.setStatus( "waiting" )
 
+            elif intent_name == "command : add_spot":
+                # TODO
+
+            elif intent_name == "command : delete_spot":
+                # TODO
+
+            elif intent_name == "command : halt":
+                self.speakInJapanese( "待機モードに移行します。" )
+                self.setStatus( "waiting" )
+
             elif intent_name == "command : resume":
 
-            elif intent_name == "command : guide_start_people":
-                self.speakInJapanese( fulfillment_text )
-                target_spot = ret.query_result.parameters["Person"]
-                self.setStatus( "guiding" )
-                callGoToSpotStart( target_spot )
-
-            elif intent_name == "command : guide_start_place":
-                self.speakInJapanese( fulfillment_text )
-                target_spot = ret.query_result.parameters["Place"]
-                self.setStatus( "guiding" )
-                callGoToSpotStart( target_spot )
+            elif intent_name == "command : start_guiding":
+                target_spot = ret.query_result.parameters["Spot"]
+                if callGoToSpotStart( target_spot ):
+                    self.speakInJapanese( fulfillment_text )
+                    self.setStatus( "guiding" )
+                else:
+                    self.speakInJapanese( target_spot + "への案内に失敗しました。" )
 
             else:
                 self.speakInJapanese( fulfillment_text )
@@ -250,21 +250,23 @@ class InteractionModule
             elif intent_name == "Default Welcome Intent":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
-            elif intent_name == "command : halt":
-                self.speakInJapanese( fulfillment_text )
-                self.setStatus( "guiding_halt_interaction" )
-
             elif intent_name == "command : abort":
                 self.speakInJapanese( fulfillment_text )
                 self.setStatus( "waiting" )
 
+            elif intent_name == "command : add_spot":
+                # TODO
+
+            elif intent_name == "command : delete_spot":
+                # TODO
+
+            elif intent_name == "command : halt":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "guiding_halt_interaction" )
+
             elif intent_name == "command : resume":
-                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
-            elif intent_name == "guiding : start : people":
-                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
-
-            elif intent_name == "guiding : start : place":
+            elif intent_name == "guiding : start_guiding":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
             else:
@@ -292,21 +294,24 @@ class InteractionModule
             elif intent_name == "Default Welcome Intent":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
-            elif intent_name == "command : halt":
-                self.speakInJapanese( fulfillment_text )
-                self.setStatus( "guiding_halt_interaction" )
-
             elif intent_name == "command : abort":
                 self.speakInJapanese( fulfillment_text )
                 self.setStatus( "waiting" )
 
+            elif intent_name == "command : add_spot":
+                # TODO
+
+            elif intent_name == "command : delete_spot":
+                # TODO
+
+            elif intent_name == "command : halt":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "guiding_halt_interaction" )
+
             elif intent_name == "command : resume":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
-            elif intent_name == "guiding : start : people":
-                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
-
-            elif intent_name == "guiding : start : place":
+            elif intent_name == "guiding : start_guiding":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
             else:
@@ -330,23 +335,26 @@ class InteractionModule
                 # DO NOTHING
 
             elif intent_name == "Default Welcome Intent":
-                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
-
-            elif intent_name == "command : halt":
                 self.speakInJapanese( fulfillment_text )
-                self.setStatus( "guiding_halt_interaction" )
 
             elif intent_name == "command : abort":
                 self.speakInJapanese( fulfillment_text )
                 self.setStatus( "waiting" )
 
+            elif intent_name == "command : add_spot":
+                # TODO
+
+            elif intent_name == "command : delete_spot":
+                # TODO
+
+            elif intent_name == "command : halt":
+                self.speakInJapanese( fulfillment_text )
+                self.setStatus( "guiding_halt_waiting" )
+
             elif intent_name == "command : resume":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
-            elif intent_name == "guiding : start : people":
-                self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
-
-            elif intent_name == "guiding : start : place":
+            elif intent_name == "guiding : start_guiding":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
             else:
