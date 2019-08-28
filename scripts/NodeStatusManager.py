@@ -43,9 +43,11 @@ class StatusManager:
                               }
         self.statushandlerthread = None
 
-        print( "initialization finished." )
-
-        self.setStatus( "default" )
+        #
+        if self.setStatus( "default" ):
+            print( "initialization finished." )
+        else:
+            print( "initialization went wrong." )
 
     def servicehandler_setstatus( self, req ):
         """
