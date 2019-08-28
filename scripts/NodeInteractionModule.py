@@ -306,7 +306,7 @@ class InteractionModule:
                     self.speakInJapanese( fulfillment_text )
                     self.setStatus( "guiding" )
                 else:
-                    self.speakInJapanese( target_spot + "への案内に失敗しました。" )
+                    self.speakInJapanese( target_spot + u"への案内に失敗しました。" )
 
             else:
                 self.speakInJapanese( fulfillment_text )
@@ -359,6 +359,7 @@ class InteractionModule:
 
             elif intent_name == "command : halt":
                 self.speakInJapanese( fulfillment_text )
+                self.callGoToSpotCancel() 
                 self.setStatus( "guiding_halt_interaction" )
 
             elif intent_name == "command : resume":
