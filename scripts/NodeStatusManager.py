@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# coding: utf-8
 
 import os
 import sys
@@ -8,7 +10,11 @@ from pr2_guide.msg import *
 from pr2_guide.srv import *
 from std_msgs.msg import *
 
-class StatusManager
+def main():
+    sm = StatusManager()
+    rospy.spin()
+
+class StatusManager:
 
     def __init__( self ):
 
@@ -17,9 +23,9 @@ class StatusManager
         self.nodename = "status_manager"
         rospy.init_node( self.nodename )
         ##
-        self.servicename_status_manager_set_status = rospy.getparam( "/pr2_guide/servicename/status_manager/status",
+        self.servicename_status_manager_set_status = rospy.get_param( "/pr2_guide/servicename/status_manager/status",
                                                                      "/status_manager/set_status" )
-        self.topicname_status_manager_status       = rospy.getparam( "/pr2_guide/topicname/status_manager/status",
+        self.topicname_status_manager_status       = rospy.get_param( "/pr2_guide/topicname/status_manager/status",
                                                                      "/status_manager/status" )
         ##
         self.service_setstatus = rospy.Service( self.servicename_status_manager_set_status, StatusManagerSetStatus, self.servicehandler_setstatus )
@@ -37,33 +43,46 @@ class StatusManager
                               }
         self.statushandlerthread = None
 
+        print( "initialization finished." )
+
+        self.setStatus( "default" )
+
     def servicehandler_setstatus( self, req ):
         """
         """
-        self.setStatus( req.status )
-        return StatusManagerSetStatusResponse( True )
+        ret = self.setStatus( req.status )
+        return StatusManagerSetStatusResponse( ret )
 
-    def setStatus( status ):
+    def setStatus( self, status ):
 
-        self.status = status
         #
-        if self.status in self.statushandlers.keys():
+        if status in self.statushandlers.keys():
+            self.status = status
             self.statushandlerthread = threading.Thread( target=self.statushandlers[self.status] )
             self.statushandlerthread.start()
-            self.statushandlerthread.detach()
-        #
-        self.publisher_status.publish( self.status )
+            self.publisher_status.publish( self.status )
+            return True
+        else:
+            return False
         
     def statushandler_default( self ):
-
-        setStatus( "waiting" )
+        print( "statushandler_default is called." )
+        self.setStatus( "waiting" )
 
     def statushandler_waiting( self ):
+        print( "statushandler_waiting is called." )
 
     def statushandler_waiting_interaction( self ):
+        print( "statushandler_waiting_interaction is called." )
 
     def statushandler_guiding( self ):
+        print( "statushandler_guiding is called." )
 
     def statushandler_guiding_halt_waiting( self ):
+        print( "statushandler_guiding_halt_waiting is called." )
 
     def statushandler_guiding_halt_interaction( self ):
+        print( "statushandler_guiding_halt_interaction is called." )
+
+if __name__ == "__main__":
+    main()
