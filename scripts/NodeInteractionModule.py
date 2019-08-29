@@ -8,10 +8,12 @@ import pickle
 
 import rospy
 import tf
+import actionlib
 from pr2_guide.srv import *
 from pr2_guide.msg import *
 from std_msgs.msg import *
 from speech_recognition_msgs.msg import *
+from sound_play.msg import *
 
 import dialogflow_v2 as dialogflow
 
@@ -30,6 +32,8 @@ class InteractionModule:
                                                                      "/status_manager/status" )
         self.topicname_speech_to_text              = rospy.get_param( "/pr2_guide/topicname/speech_to_text",
                                                                      "/speech_to_text_pr2_guide" )
+        self.actionname_robotsound_jp              = rospy.get_param( "/pr2_guide/actionname/robotsound_jp",
+                                                                     "/robotsound_jp" )
         self.servicename_status_manager_set_status = rospy.get_param( "/pr2_guide/servicename/status_manager/set_status",
                                                                      "/status_manager/set_status" )
         self.servicename_go_to_spot_start          = rospy.get_param( "/pr2_guide/servicename/go_to_spot/start",
@@ -47,9 +51,8 @@ class InteractionModule:
         self.subscriber_speech_to_text = rospy.Subscriber( self.topicname_speech_to_text, 
                                                            SpeechRecognitionCandidates, 
                                                            self.subscribercallback_speech_to_text )
-
-        ##
         self.listener = tf.TransformListener()
+        self.actionclient_robotsound_jp = actionlib.SimpleActionClient( self.actionname_robotsound_jp, SoundRequestAction )
         
         # member variables initialization for dialog flow
         self.language_code         = rospy.get_param( "/pr2_guide/config/interaction_module/language_code" )
@@ -90,6 +93,13 @@ class InteractionModule:
     def speakInJapanese( self, text ):
         #TBD
         print( "speaking : " + text )
+        msg = SoundRequest(
+                    command = SoundRequest.PLAY_ONCE,
+                    sound = SoundRequest.SAY,
+                    volume = 1.0,
+                    arg = text,
+                    arg2 = "ja" )
+        self.actionclient_robotsound_jp.send_goal_and_wait( SoundRequestGoal( sound_request=msg ), rospy.Duration( 10.0 ) )
 
     def isaliveStatusHandler( self ):
         if self.statushandlerthread is None:
@@ -365,7 +375,7 @@ class InteractionModule:
             elif intent_name == "command : resume":
                 print( "intent_name : " + intent_name + ", do nothing." )
 
-            elif intent_name == "guiding : start_guiding":
+            elif intent_name == "command : start_guiding":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
             else:
@@ -424,7 +434,7 @@ class InteractionModule:
             elif intent_name == "command : resume":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
-            elif intent_name == "guiding : start_guiding":
+            elif intent_name == "command : start_guiding":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
             else:
@@ -481,7 +491,7 @@ class InteractionModule:
             elif intent_name == "command : resume":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
-            elif intent_name == "guiding : start_guiding":
+            elif intent_name == "command : start_guiding":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
 
             else:
