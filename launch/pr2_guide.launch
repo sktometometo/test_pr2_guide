@@ -1,5 +1,5 @@
 <launch>
-    <param name="/pr2_guide/filename/spot_manager/config"            value="$(find pr2_guide)/spotserver.pickle" />
+    <param name="/pr2_guide/filename/spot_manager/config"            value="$(find pr2_guide)/config/spotserver.pickle" />
     <param name="/pr2_guide/filename/interaction_module/credential"  value="" />
     <param name="/pr2_guide/config/interaction_module/project_id"    value="" />
     <param name="/pr2_guide/config/interaction_module/session_id"    value="" />
