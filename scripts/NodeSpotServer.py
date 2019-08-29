@@ -5,6 +5,7 @@ import os
 import sys
 import rospy
 import pickle
+import yaml
 from pr2_guide.srv import *
 from pr2_guide.msg import *
 
@@ -29,7 +30,7 @@ class SpotServer:
         self.spotlist = {}
         #
         try:
-            self.filepath = rospy.get_param( "/pr2_guide/filename/spot_manager/config", "~/spotserver.pickle" )
+            self.filepath = rospy.get_param( "/pr2_guide/filename/spot_manager/config", "~/spotserver.yaml" )
             if os.path.exists( self.filepath ):
                 self.load_spotlist( self.filepath )
             print( "initialize finished." )
@@ -43,8 +44,9 @@ class SpotServer:
         if self.filepath is None:
             return False
         if os.path.exists( os.path.abspath( filepath ) ):
-            with open( filepath, "rb" ) as f:
-                self.spotlist = pickle.load( f )
+            with open( filepath, "r" ) as f:
+                yamldata = yaml.load( f )
+                self.spotlist = yamldata.spots
             return True
         else:
             return False
@@ -53,16 +55,61 @@ class SpotServer:
         if self.filepath is None:
             return False
         else:
-            with open( filepath, "wb" ) as f:
-                pickle.dump( self.spotlist, f )
+            with open( filepath, "w" ) as f:
+                yaml.dump( { "spots":self.spotlist }, f )
             return True
+
+    def yaml2spot( self, yamled_spot ):
+        if "header" not in yamled_spot.keys() \
+            or "name" not in yamled_spot.keys() \
+            or "aliases" not in yamled_spot.keys() \
+            or "pose" not in yamled_spot.keys() :
+            return None
+            # TODO : Exception のクラスを作ってなげるようにする
+        else:
+            ret_spot = Spot()
+            ret_spot.header.frame_id    = yamled_spot["header"]["frame_id"]
+            ret_spot.name               = yamled_spot["name"]
+            ret_spot.aliases            = yamled_spot["aliases"]
+            ret_spot.pose.position.x    = yamled_spot["pose"]["position"]["x"]
+            ret_spot.pose.position.y    = yamled_spot["pose"]["position"]["y"]
+            ret_spot.pose.position.x    = yamled_spot["pose"]["position"]["z"]
+            ret_spot.pose.orientation.x = yamled_spot["pose"]["orientation"]["x"]
+            ret_spot.pose.orientation.y = yamled_spot["pose"]["orientation"]["y"]
+            ret_spot.pose.orientation.z = yamled_spot["pose"]["orientation"]["z"]
+            ret_spot.pose.orientation.w = yamled_spot["pose"]["orientation"]["w"]
+            return ret_spot
+
+    def spot2yaml( self, spot_obj ):
+        if type( spot_obj ) is not type( Obj ):
+            return None
+        else:
+            return { "header"  : 
+                        { "seq" : Spot.header.seq, 
+                          "stamp" : { "secs" : Spot.header.stamp.secs, "nsecs" : Spot.header.stamp.nsecs },
+                          "frame_id" : Spot.header.frame_id },
+                     "name"    : Spot.name,
+                     "aliases" : Spot.aliases,
+                     "pose"    : 
+                        { "position"    : 
+                              { "x" : Spot.pose.position.x,
+                                "y" : Spot.pose.position.y,
+                                "z" : Spot.pose.position.z },
+                          "orientation" :
+                              { "x" : Spot.pose.orientation.x,
+                                "y" : Spot.pose.orientation.y,
+                                "z" : Spot.pose.orientation.z,
+                                "w" : Spot.pose.orientation.w }
+                              }
+                        }
+
 
     def servicehandler_add( self, req ):
         print( "add service called" )
         spot = req.spot
         if spot.name in self.spotlist.keys():
             return SpotManagerAddResponse( False )
-        self.spotlist[ spot.name ] = spot
+        self.spotlist[ spot.name ] = self.spot2yaml( spot )
         return SpotManagerAddResponse( True )
 
     def servicehandler_delete( self, req ):
@@ -73,7 +120,7 @@ class SpotServer:
 
     def servicehandler_get( self, req ):
         print( "get service called" )
-        return SpotManagerGetResponse( list( self.spotlist.values() ) )
+        return SpotManagerGetResponse( map( self.spot2yaml, list( self.spotlist.values() ) ) )
 
     def servicehandler_save( self, req ):
         print( "save service called" )
