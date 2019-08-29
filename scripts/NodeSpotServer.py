@@ -29,7 +29,7 @@ class SpotServer:
         self.spotlist = {}
         #
         try:
-            self.filepath = rospy.get_param( "/pr2_guide/filename/spot_manager/config" )
+            self.filepath = rospy.get_param( "/pr2_guide/filename/spot_manager/config", "~/spotserver.pickle" )
             if os.path.exists( self.filepath ):
                 self.load_spotlist( self.filepath )
             print( "initialize finished." )
