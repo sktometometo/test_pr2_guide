@@ -40,16 +40,16 @@
 
     (:subscriber-cb-checking-goal (msg)
         (print "checking goal cb is called")
-        (if (eq (send (send msg :status :result) :text) "Goal reached.")
-            (send :set-status :waiting-interaction)
-            nil)
+        (send self :set-status "waiting-interaction")
+        (print (send (send msg :status) :text))
         )
 
     (:set-status (status)
         (print "set-status is called")
-        (let* ((req (instance pr2_guide::StatusManagerSetStatusRequest :init status))
+        (let* ((req (instance pr2_guide::StatusManagerSetStatusRequest :init))
                ret
                )
+            (send req :status status)
             (setq ret (send (ros::service-call servicename-status-manager-set-status req) :ret))
             )
         )
@@ -83,7 +83,7 @@
                 (progn
                     (send (send goal-pose :position) :z 0)
                     (setq goal-pose (ros::tf-pose->coords goal-pose))
-                    ;;(send *ri* :move-to goal-pose :frame-id frame-id :no-wait t)
+                    (send *ri* :move-to goal-pose :frame-id frame-id :no-wait t)
                     (print "move_base action is called")
                     (print goal-pose)
                     (send res :ret t)
