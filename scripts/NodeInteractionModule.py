@@ -30,6 +30,8 @@ class InteractionModule:
                                                                      "/status_manager/status" )
         self.topicname_speech_to_text              = rospy.get_param( "/pr2_guide/topicname/speech_to_text",
                                                                      "/speech_to_text_pr2_guide" )
+        self.topicname_robotsound_jp               = rospy.get_param( "/pr2_guide/topicnamae/robotsound_jp",
+                                                                      "/robotsound_jp" )
         self.servicename_status_manager_set_status = rospy.get_param( "/pr2_guide/servicename/status_manager/set_status",
                                                                      "/status_manager/set_status" )
         self.servicename_go_to_spot_start          = rospy.get_param( "/pr2_guide/servicename/go_to_spot/start",
@@ -47,6 +49,8 @@ class InteractionModule:
         self.subscriber_speech_to_text = rospy.Subscriber( self.topicname_speech_to_text, 
                                                            SpeechRecognitionCandidates, 
                                                            self.subscribercallback_speech_to_text )
+        self.publisher_robotsound_jp = rospy.Publisher( self.topicname_robotsound_jp,
+                                                        SoundRequest )
 
         ##
         self.listener = tf.TransformListener()
@@ -90,6 +94,13 @@ class InteractionModule:
     def speakInJapanese( self, text ):
         #TBD
         print( "speaking : " + text )
+        msg = SoundRequest()
+        msg.command = SoundRequest.PLAY_ONCE
+        msg.sound = SoundRequest.SAY
+        msg.arg = text
+        msg.args = "ja"
+        msg.volume = 1.0
+        self.publisher_robotsound_jp( msg )
 
     def isaliveStatusHandler( self ):
         if self.statushandlerthread is None:
