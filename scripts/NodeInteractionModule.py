@@ -155,7 +155,7 @@ class InteractionModule:
         SpotManagerAddService = rospy.ServiceProxy( self.servicename_spot_manager_add, SpotManagerAdd )
         req = SpotManagerAddRequest()
         # tf
-        (translation, rotation) = self.listener.lookupTransform( "base_link", "map",  rospy.Time(0) )
+        (translation, rotation) = self.listener.lookupTransform( "map", "base_link",  rospy.Time(0) )
         quat = tf.transformations.quaternion_from_euler( rotation[0], rotation[1], rotation[2] )
         # TODO
         req.spot.header.stamp       = rospy.Time(0)
