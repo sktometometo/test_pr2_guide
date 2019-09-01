@@ -1,141 +1,121 @@
-spots: 
-  - 
-    header: 
-      seq: 0
-      stamp: 
-        secs: 0
-        nsecs:         0
-      frame_id: "map"
-    name: ''
+spots:
+  73A1:
     aliases:
-        - ''
-    pose: 
-      position: 
-        x: -0.572423465095
-        y: 7.21051505614
-        z: 0.051
-      orientation: 
-        x: 0.0
-        y: 0.0
-        z: -0.356254274375
-        w: 0.934389047447
-  - 
-    header: 
+    - 73A1
+    header:
+      frame_id: map
       seq: 0
-      stamp: 
+      stamp:
+        nsecs: 0
         secs: 0
-        nsecs:         0
-      frame_id: "map"
-    name: !!python/str "\u7537\u5B50\u30C8\u30A4\u30EC"
-    aliases: 
-        - !!python/str "\u7537\u5B50\u30C8\u30A4\u30EC"
-    pose: 
-      position: 
-        x: 8.65535594618
-        y: -7.74751108176
-        z: 0.051
-      orientation: 
-        x: 0.0
-        y: 0.0
-        z: -0.00955762379881
-        w: 0.999954324871
-  - 
-    header: 
-      seq: 0
-      stamp: 
-        secs: 0
-        nsecs:         0
-      frame_id: "map"
-    name: "JSK"
-    aliases: 
-        - JSK
-    pose: 
-      position: 
-        x: -0.486290292428
-        y: 0.746119475318
-        z: 0.051
-      orientation: 
-        x: 0.0
-        y: 0.0
-        z: -0.34272781219
-        w: 0.939434748533
-  - 
-    header: 
-      seq: 0
-      stamp: 
-        secs: 0
-        nsecs:         0
-      frame_id: "map"
-    name: "73B2"
-    aliases: 
-        - 73B2
-    pose: 
-      position: 
-        x: -0.572422933151
-        y: 7.21051474568
-        z: 0.051
-      orientation: 
-        x: 0.0
-        y: 0.0
-        z: -0.35625430166
-        w: 0.934389037044
-  - 
-    header: 
-      seq: 0
-      stamp: 
-        secs: 0
-        nsecs:         0
-      frame_id: "map"
-    name: !!python/str "\u30DB\u30FC\u30E0\u30DD\u30B8\u30B7\u30E7\u30F3"
-    aliases: 
-        - !!python/str "\u30DB\u30FC\u30E0\u30DD\u30B8\u30B7\u30E7\u30F3"
-    pose: 
-      position: 
-        x: 5.61081631424
-        y: 5.90918808171
-        z: 0.051
-      orientation: 
-        x: 0.0
-        y: 0.0
-        z: -0.362389491782
-        w: 0.932026746529
-  - 
-    header: 
-      seq: 0
-      stamp: 
-        secs: 0
-        nsecs:         0
-      frame_id: "map"
-    name: "73A1"
-    aliases: 
-        - 73A1
-    pose: 
-      position: 
-        x: -1.7376410056
-        y: 0.22225253559
-        z: 0.051
-      orientation: 
+    name: 73A1
+    pose:
+      orientation:
+        w: 0.940086765938
         x: 0.0
         y: 0.0
         z: -0.340935290794
-        w: 0.940086765938
-  - 
-    header: 
-      seq: 0
-      stamp: 
-        secs: 0
-        nsecs:         0
-      frame_id: "map"
-    name: "73A2"
-    aliases: 
-        - 73A2
-    pose: 
-      position: 
-        x: -1.72266309279
-        y: 3.62246813913
+      position:
+        x: -1.7376410056
+        y: 0.22225253559
         z: 0.051
-      orientation: 
+  73A2:
+    aliases:
+    - 73A2
+    header:
+      frame_id: map
+      seq: 0
+      stamp:
+        nsecs: 0
+        secs: 0
+    name: 73A2
+    pose:
+      orientation:
+        w: 0.936249347706
         x: 0.0
         y: 0.0
         z: -0.351336247662
-        w: 0.936249347706
+      position:
+        x: -1.72266309279
+        y: 3.62246813913
+        z: 0.051
+  73B2:
+    aliases:
+    - 73B2
+    header:
+      frame_id: map
+      seq: 0
+      stamp:
+        nsecs: 0
+        secs: 0
+    name: 73B2
+    pose:
+      orientation:
+        w: 0.934389037044
+        x: 0.0
+        y: 0.0
+        z: -0.35625430166
+      position:
+        x: -0.572422933151
+        y: 7.21051474568
+        z: 0.051
+  JSK:
+    aliases:
+    - JSK
+    header:
+      frame_id: map
+      seq: 0
+      stamp:
+        nsecs: 0
+        secs: 0
+    name: JSK
+    pose:
+      orientation:
+        w: 0.939434748533
+        x: 0.0
+        y: 0.0
+        z: -0.34272781219
+      position:
+        x: -0.486290292428
+        y: 0.746119475318
+        z: 0.051
+  ホームポジション:
+    aliases:
+    - ホームポジション
+    header:
+      frame_id: map
+      seq: 0
+      stamp:
+        nsecs: 0
+        secs: 0
+    name: ホームポジション
+    pose:
+      orientation:
+        w: 0.932026746529
+        x: 0.0
+        y: 0.0
+        z: -0.362389491782
+      position:
+        x: 5.61081631424
+        y: 5.90918808171
+        z: 0.051
+  男子トイレ:
+    aliases:
+    - 男子トイレ
+    header:
+      frame_id: map
+      seq: 0
+      stamp:
+        nsecs: 0
+        secs: 0
+    name: 男子トイレ
+    pose:
+      orientation:
+        w: 0.999954324871
+        x: 0.0
+        y: 0.0
+        z: -0.00955762379881
+      position:
+        x: 8.65535594618
+        y: -7.74751108176
+        z: 0.051

@@ -9,6 +9,19 @@ import yaml
 from pr2_guide.srv import *
 from pr2_guide.msg import *
 
+def str2unicode_in_yaml( yamldata ):
+
+    if type( yamldata ) == list:
+        return map( str2unicode_in_yaml, yamldata )
+    elif type( yamldata ) == dict:
+        return dict( [ (key, str2unicode_in_yaml( val )) for key,val in yamldata.items() ]  )
+    #elif type( yamldata ) == str:
+    #    return yamldata.decode( "utf-8" )
+    elif type( yamldata ) == unicode:
+        return yamldata.encode( "utf-8" )
+    else:
+        return yamldata
+
 class SpotServer:
 
     def __init__( self ):
@@ -29,34 +42,46 @@ class SpotServer:
         # SpotManager
         self.spotlist = {}
         #
-        try:
-            self.filepath = rospy.get_param( "/pr2_guide/filename/spot_manager/config", "~/spotserver.yaml" )
-            if os.path.exists( self.filepath ):
-                self.load_spotlist( self.filepath )
-            print( "initialize finished." )
-        except KeyError:
-            self.filepath = None
+        self.filepath = os.path.expandvars( os.path.expanduser( rospy.get_param( "/pr2_guide/filename/spot_manager/config", "~/spotserver.yaml" ) ) )
+        print( "self.filepath is " + self.filepath )
+        if os.path.exists( self.filepath ):
+            self.load_spotlist( self.filepath )
+        else:
+            print( self.filepath + " does not exist." )
+        print( "initialize finished." )
 
     def __del__( self ):
         self.save_spotlist( self.filepath )
 
     def load_spotlist( self, filepath ):
+        print( "load_spotlist is called. filepath is " + filepath )
         if self.filepath is None:
             return False
         if os.path.exists( os.path.abspath( filepath ) ):
             with open( filepath, "r" ) as f:
-                yamldata = yaml.load( f )
-                self.spotlist = yamldata.spots
+                yamldata = yaml.load( f, Loader=yaml.SafeLoader )
+                yamldata = str2unicode_in_yaml( yamldata )
+                tempspotlist = yamldata["spots"]
+
+                if type( tempspotlist ) == dict:
+                    self.spotlist = tempspotlist
+
+                elif type( tempspotlist ) == list:
+                    self.spotlist = {}
+                    for x in tempspotlist:
+                        self.spotlist[x["name"]] = x
+
             return True
         else:
             return False
 
     def save_spotlist( self, filepath ):
+        print( "save_spotlist is called. filepath is " + filepath )
         if self.filepath is None:
             return False
         else:
             with open( filepath, "w" ) as f:
-                yaml.dump( { "spots":self.spotlist }, f )
+                yaml.safe_dump( { "spots":self.spotlist }, f, encoding="utf-8", allow_unicode=True )
             return True
 
     def yaml2spot( self, yamled_spot ):
@@ -81,7 +106,7 @@ class SpotServer:
             return ret_spot
 
     def spot2yaml( self, spot_obj ):
-        if type( spot_obj ) is not type( Obj ):
+        if type( spot_obj ) is not type( Spot ):
             return None
         else:
             return { "header"  : 
@@ -120,7 +145,7 @@ class SpotServer:
 
     def servicehandler_get( self, req ):
         print( "get service called" )
-        return SpotManagerGetResponse( map( self.spot2yaml, list( self.spotlist.values() ) ) )
+        return SpotManagerGetResponse( map( self.yaml2spot, list( self.spotlist.values() ) ) )
 
     def servicehandler_save( self, req ):
         print( "save service called" )
