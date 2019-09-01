@@ -43,18 +43,16 @@ class SpotServer:
         self.spotlist = {}
         #
         self.filepath = os.path.expandvars( os.path.expanduser( rospy.get_param( "/pr2_guide/filename/spot_manager/config", "~/spotserver.yaml" ) ) )
-        print( "self.filepath is " + self.filepath )
         if os.path.exists( self.filepath ):
             self.load_spotlist( self.filepath )
         else:
-            print( self.filepath + " does not exist." )
-        print( "initialize finished." )
+            rospy.loginfo( self.filepath + " does not exist." )
+        rospy.loginfo( "initialize finished." )
 
     def __del__( self ):
         self.save_spotlist( self.filepath )
 
     def load_spotlist( self, filepath ):
-        print( "load_spotlist is called. filepath is " + filepath )
         if self.filepath is None:
             return False
         if os.path.exists( os.path.abspath( filepath ) ):
@@ -76,7 +74,6 @@ class SpotServer:
             return False
 
     def save_spotlist( self, filepath ):
-        print( "save_spotlist is called. filepath is " + filepath )
         if self.filepath is None:
             return False
         else:
@@ -130,7 +127,7 @@ class SpotServer:
 
 
     def servicehandler_add( self, req ):
-        print( "add service called" )
+        rospy.loginfo( "add service called" )
         spot = req.spot
         if spot.name in self.spotlist.keys():
             return SpotManagerAddResponse( False )
@@ -138,17 +135,17 @@ class SpotServer:
         return SpotManagerAddResponse( True )
 
     def servicehandler_delete( self, req ):
-        print( "del service called" )
+        rospy.loginfo( "del service called" )
         if req.name in self.spotlist.keys():
             self.spotlist.pop( req.name )
         return SpotManagerDeleteResponse( True )
 
     def servicehandler_get( self, req ):
-        print( "get service called" )
+        rospy.loginfo( "get service called" )
         return SpotManagerGetResponse( map( self.yaml2spot, list( self.spotlist.values() ) ) )
 
     def servicehandler_save( self, req ):
-        print( "save service called" )
+        rospy.loginfo( "save service called" )
         ret = self.save_spotlist( self.filepath )
         return SpotManagerSaveResponse( ret )
 

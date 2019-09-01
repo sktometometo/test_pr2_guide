@@ -45,9 +45,9 @@ class StatusManager:
 
         #
         if self.setStatus( "default" ):
-            print( "initialization finished." )
+            rospy.loginfo( "initialization finished." )
         else:
-            print( "initialization went wrong." )
+            rospy.logerr( "initialization has gone wrong." )
 
     def servicehandler_setstatus( self, req ):
         """
@@ -68,23 +68,23 @@ class StatusManager:
             return False
         
     def statushandler_default( self ):
-        print( "statushandler_default is called." )
+        rospy.loginfo( "statushandler_default is called." )
         self.setStatus( "waiting" )
 
     def statushandler_waiting( self ):
-        print( "statushandler_waiting is called." )
+        rospy.loginfo( "statushandler_waiting is called." )
 
     def statushandler_waiting_interaction( self ):
-        print( "statushandler_waiting_interaction is called." )
+        rospy.loginfo( "statushandler_waiting_interaction is called." )
 
     def statushandler_guiding( self ):
-        print( "statushandler_guiding is called." )
+        rospy.loginfo( "statushandler_guiding is called." )
 
     def statushandler_guiding_halt_waiting( self ):
-        print( "statushandler_guiding_halt_waiting is called." )
+        rospy.loginfo( "statushandler_guiding_halt_waiting is called." )
 
     def statushandler_guiding_halt_interaction( self ):
-        print( "statushandler_guiding_halt_interaction is called." )
+        rospy.loginfo( "statushandler_guiding_halt_interaction is called." )
 
 if __name__ == "__main__":
     main()

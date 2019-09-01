@@ -82,7 +82,7 @@ class InteractionModule:
         self.df_sessionclient = dialogflow.SessionsClient()
         self.df_session       = self.df_sessionclient.session_path( self.dialogflow_project_id, self.dialogflow_session_id )
 
-        print( "module initialization finished." )
+        rospy.loginfo( "InteractionModule instance initialization has finished." )
 
     def sendQuery( self, text ):
         text_input  = dialogflow.types.TextInput( text=text, language_code=self.language_code )
@@ -92,7 +92,7 @@ class InteractionModule:
 
     def speakInJapanese( self, text ):
         #TBD
-        print( "speaking : " + text )
+        rospy.loginfo( "Speaking : " + text )
         msg = SoundRequest(
                     command = SoundRequest.PLAY_ONCE,
                     sound = SoundRequest.SAY,
@@ -185,7 +185,7 @@ class InteractionModule:
             return False
 
     def subscribercallback_speech_to_text( self, msg ):
-        print( "subscribercallback_speech_to_text is called" )
+        rospy.loginfo( "subscribercallback_speech_to_text is called" )
         self.buffer_text.append( msg.transcript[0] )
         self.isok = True
 
@@ -193,7 +193,7 @@ class InteractionModule:
             self.startStatusHandler()
 
     def subscribercallback_status( self, msg ):
-        print( "subscribercallback_status is called" )
+        rospy.loginfo( "subscribercallback_status is called" )
         #
         if self.isaliveStatusHandler():
             self.stopStatusHandler()
@@ -203,12 +203,12 @@ class InteractionModule:
         self.startStatusHandler()
 
     def statushandler_default( self ):
-        print( "statushandler_default is called" )
+        rospy.loginfo( "statushandler_default is called" )
 
         self.isok = False
 
     def statushandler_waiting( self ):
-        print( "statushandler_waiting is called" )
+        rospy.loginfo( "statushandler_waiting is called" )
 
         bufstr = ""
 
@@ -219,10 +219,7 @@ class InteractionModule:
             ret = self.sendQuery( bufstr )
             intent_name = ret.query_result.intent.display_name
             temp_ft = ret.query_result.fulfillment_text
-            print( "bufstr : " + bufstr )
-            print( "type : " + str( type( temp_ft ) ) )
-            print( "temp_ft : " + temp_ft )
-            print( "intent_name : " + intent_name )
+            rospy.loginfo( "intent_name : " + intent_name )
             fulfillment_text = ret.query_result.fulfillment_text
 
             if intent_name == "Default Fallback Intent":
@@ -233,19 +230,19 @@ class InteractionModule:
                 self.setStatus( "waiting_interaction" )
 
             elif intent_name == "command : abort":
-                print( "intent_name : " + intent_name + ", do nothing." )
+                rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
 
             elif intent_name == "command : add_spot":
-                print( "intent_name : " + intent_name + ", do nothing." )
+                rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
 
             elif intent_name == "command : delete_spot":
-                print( "intent_name : " + intent_name + ", do nothing." )
+                rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
 
             elif intent_name == "command : halt":
-                print( "intent_name : " + intent_name + ", do nothing." )
+                rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
 
             elif intent_name == "command : resume":
-                print( "intent_name : " + intent_name + ", do nothing." )
+                rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
 
             elif intent_name == "command : start_guiding":
                 target_spot = ret.query_result.parameters["Spot"]
@@ -262,7 +259,7 @@ class InteractionModule:
         self.isok = False
 
     def statushandler_waiting_interaction( self ):
-        print( "statushandler_waiting_interaction is called" )
+        rospy.loginfo( "statushandler_waiting_interaction is called" )
 
         bufstr = ""
 
@@ -273,10 +270,7 @@ class InteractionModule:
             ret = self.sendQuery( bufstr )
             intent_name = ret.query_result.intent.display_name
             temp_ft = ret.query_result.fulfillment_text
-            print( "bufstr : " + bufstr )
-            print( "type : " + str( type( temp_ft ) ) )
-            print( "temp_ft : " + temp_ft )
-            print( "intent_name : " + intent_name )
+            rospy.loginfo( "intent_name : " + intent_name )
             fulfillment_text = ret.query_result.fulfillment_text
 
             if intent_name == "Default Fallback Intent":
@@ -308,7 +302,7 @@ class InteractionModule:
                 self.setStatus( "waiting" )
 
             elif intent_name == "command : resume":
-                print( "intent_name : " + intent_name + ", do nothing." )
+                rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
 
             elif intent_name == "command : start_guiding":
                 target_spot = ret.query_result.parameters["Spot"]
@@ -325,7 +319,7 @@ class InteractionModule:
         self.isok = False
 
     def statushandler_guiding( self ):
-        print( "statushandler_guiding is called" )
+        rospy.loginfo( "statushandler_guiding is called" )
 
         bufstr = ""
 
@@ -336,10 +330,7 @@ class InteractionModule:
             ret = self.sendQuery( bufstr )
             intent_name = ret.query_result.intent.display_name
             temp_ft = ret.query_result.fulfillment_text
-            print( "bufstr : " + bufstr )
-            print( "type : " + str( type( temp_ft ) ) )
-            print( "temp_ft : " + temp_ft )
-            print( "intent_name : " + intent_name )
+            rospy.loginfo( "intent_name : " + intent_name )
             fulfillment_text = ret.query_result.fulfillment_text
 
             if intent_name == "Default Fallback Intent":
@@ -373,7 +364,7 @@ class InteractionModule:
                 self.setStatus( "guiding_halt_interaction" )
 
             elif intent_name == "command : resume":
-                print( "intent_name : " + intent_name + ", do nothing." )
+                rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
 
             elif intent_name == "command : start_guiding":
                 self.speakInJapanese( "道案内動作中です。他の案内をご希望される場合は、一度中止してください。" )
@@ -385,7 +376,7 @@ class InteractionModule:
         self.isok = False
 
     def statushandler_guiding_halt_waiting( self ):
-        print( "statushandler_guiding_halt_waiting is called" )
+        rospy.loginfo( "statushandler_guiding_halt_waiting is called" )
 
         bufstr = ""
 
@@ -396,10 +387,7 @@ class InteractionModule:
             ret = self.sendQuery( bufstr )
             intent_name = ret.query_result.intent.display_name
             temp_ft = ret.query_result.fulfillment_text
-            print( "bufstr : " + bufstr )
-            print( "type : " + str( type( temp_ft ) ) )
-            print( "temp_ft : " + temp_ft )
-            print( "intent_name : " + intent_name )
+            rospy.loginfo( "intent_name : " + intent_name )
             fulfillment_text = ret.query_result.fulfillment_text
 
             if intent_name == "Default Fallback Intent":
@@ -442,7 +430,7 @@ class InteractionModule:
                 self.speakInJapanese( "未知のインテントが返ってきています。" )
 
     def statushandler_guiding_halt_interaction( self ):
-        print( "statushandler_guiding_halt_interaction is called" )
+        rospy.loginfo( "statushandler_guiding_halt_interaction is called" )
 
         bufstr = ""
 
@@ -453,10 +441,7 @@ class InteractionModule:
             ret = self.sendQuery( bufstr )
             intent_name = ret.query_result.intent.display_name
             temp_ft = ret.query_result.fulfillment_text
-            print( "bufstr : " + bufstr )
-            print( "type : " + str( type( temp_ft ) ) )
-            print( "temp_ft : " + temp_ft )
-            print( "intent_name : " + intent_name )
+            rospy.loginfo( "intent_name : " + intent_name )
             fulfillment_text = ret.query_result.fulfillment_text
 
             if intent_name == "Default Fallback Intent":
