@@ -8,6 +8,7 @@ import pickle
 import yaml
 from pr2_guide.srv import *
 from pr2_guide.msg import *
+from visualization_msgs.msg import *
 
 def str2unicode_in_yaml( yamldata ):
 
@@ -34,11 +35,15 @@ class SpotServer:
         self.servicename_delete = rospy.get_param( "/pr2_guide/servicename/spot_manager/delete", "/spot_manager/delete" )
         self.servicename_get    = rospy.get_param( "/pr2_guide/servicename/spot_manager/get",    "/spot_manager/get" )
         self.servicename_save   = rospy.get_param( "/pr2_guide/servicename/spot_manager/save",   "/spot_manager/save" ) 
+        self.topicname_markers  = rospy.get_param( "/pr2_guide/topicname/spot_manager/markers",  "/spot_manager/markers" )
         ##
         self.service_add    = rospy.Service( self.servicename_add,    SpotManagerAdd,    self.servicehandler_add )
         self.service_delete = rospy.Service( self.servicename_delete, SpotManagerDelete, self.servicehandler_delete )
         self.service_get    = rospy.Service( self.servicename_get,    SpotManagerGet,    self.servicehandler_get )
         self.service_save   = rospy.Service( self.servicename_save,   SpotManagerSave,   self.servicehandler_save )
+        self.publisher_markers = rospy.Publisher( self.topicname_markers, MarkerArray, queue_size=1 )
+        ##
+        rospy.Rate(1)
         # SpotManager
         self.spotlist = {}
         #
@@ -72,6 +77,45 @@ class SpotServer:
             return True
         else:
             return False
+
+    def hash_str2int32( self, string ):
+
+        return int( "0X" + hashlib.md5( string ).hexdigest()[:4] , 0 )
+
+    def delete_markerarray_spotlist( self ):
+        msg = MarkerArray()
+        marker = Marker()
+        marker.header.stamp = rospy.Time.now()
+        marker.ns = "/spot_server"
+        marker.id = 0
+        marker.action = Marker.DELETE_ALL
+        marker.lifetime = rospy.Duration()
+        msg.markers.append( marker )
+        self.publisher_markers( msg )
+
+    def publish_markerarray_spotlist( self ):
+        msg = MarkerArray()
+        for index, yamlspot in enumerate( self.spotlist.values() ):
+            spot = self.yaml2spot( yamlspot )
+            marker = Marker()
+            marker.header.frame_id = spot.header.frame_id
+            marker.header.stamp = rospy.Time.now()
+            marker.ns = "/spot_server"
+            marker.id = self.hash_str2int32( spot.name )
+            marker.type = Marker.MESH_RESOURCE
+            marker.mesh_resource = "package://pr2_guide/meshes/pin_marker.stl"
+            marker.action = Marker.ADD
+            marker.pose = spot.pose
+            marker.scale.x = 1.0
+            marker.scale.y = 1.0
+            marker.scale.z = 1.0
+            marker.color.r = 0.0
+            marker.color.g = 1.0
+            marker.color.b = 0.0
+            marker.color.a = 0.0
+            marker.lifetime = rospy.Duration()
+            msg.markers.append( marker )
+        self.publisher_markers( msg )
 
     def save_spotlist( self, filepath ):
         if self.filepath is None:
@@ -127,17 +171,52 @@ class SpotServer:
 
 
     def servicehandler_add( self, req ):
+        ## log
         rospy.loginfo( "add service called" )
+        ## spotlist
         spot = req.spot
         if spot.name in self.spotlist.keys():
             return SpotManagerAddResponse( False )
-        self.spotlist[ spot.name ] = self.spot2yaml( spot )
+        yamlspot = self.spot2yaml( spot )
+        self.spotlist[ spot.name ] = yamlspot
+        ##
+        msg = MarkerArray()
+        marker = Marker()
+        marker.header.frame_id = spot.header.frame_id
+        marker.header.stamp = rospy.Time.now()
+        marker.ns = "/spot_server"
+        marker.id = self.hash_str2int32( spot.name )
+        marker.type = Marker.MESH_RESOURCE
+        marker.mesh_resource = "package://pr2_guide/meshes/pin_marker.stl"
+        marker.action = Marker.ADD
+        marker.pose = spot.pose
+        marker.scale.x = 1.0
+        marker.scale.y = 1.0
+        marker.scale.z = 1.0
+        marker.color.r = 0.0
+        marker.color.g = 1.0
+        marker.color.b = 0.0
+        marker.color.a = 0.0
+        marker.lifetime = rospy.Duration()
+        msg.markers.append( marker )
+        ##
         return SpotManagerAddResponse( True )
 
     def servicehandler_delete( self, req ):
         rospy.loginfo( "del service called" )
         if req.name in self.spotlist.keys():
-            self.spotlist.pop( req.name )
+            ##
+            tempspot = self.spotlist.pop( req.name )
+            ## dlete markerarray
+            msg = MarkerArray()
+            marker = Marker()
+            marker.header.frame_id = tempspot.header.frame_id
+            marker.header.stamp = rospy.Time.now()
+            marker.ns = "/spot_server"
+            marker.id = self.hash_str2int32( tempspot.name )
+            marker.action = Marker.DELTE
+            msg.markers.append( marker )
+            self.publisher_markers( msg )
         return SpotManagerDeleteResponse( True )
 
     def servicehandler_get( self, req ):
