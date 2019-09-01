@@ -4,6 +4,7 @@
 import os
 import sys
 import threading
+import time
 
 import rospy
 from pr2_guide.msg import *
@@ -44,7 +45,9 @@ class StatusManager:
         self.statushandlerthread = None
 
         #
-        if self.setStatus( "default" ):
+        time.sleep( 1 ) # 以下の初期化処理時に /status_maanger/status にpublishされるように待つ処理. やばいのできちんと待つ対象を明確にしたい TODO
+        ret = self.setStatus( "default" )
+        if ret:
             rospy.loginfo( "initialization finished." )
         else:
             rospy.logerr( "initialization has gone wrong." )
