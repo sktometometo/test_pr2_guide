@@ -92,7 +92,7 @@ class InteractionModule:
 
     def speakInJapanese( self, text ):
         #TBD
-        rospy.loginfo( "Speaking : " + text )
+        rospy.loginfo( "Speaking : " + text.encode( "utf-8" ) )
         msg = SoundRequest(
                     command = SoundRequest.PLAY_ONCE,
                     sound = SoundRequest.SAY,
