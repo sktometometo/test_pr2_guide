@@ -1,8 +1,8 @@
 <launch>
-    <param name="/pr2_guide/filename/spot_manager/config"            value="$(find pr2_guide)/yaml/spotserver.yaml" />
-    <param name="/pr2_guide/filename/interaction_module/credential"  value="" />
-    <param name="/pr2_guide/config/interaction_module/project_id"    value="" />
-    <param name="/pr2_guide/config/interaction_module/session_id"    value="" />
+    <param name="/pr2_guide/filename/spot_manager/config"            value="$(find pr2_guide)/yaml/spots.yaml" />
+    <param name="/pr2_guide/filename/interaction_module/credential"  value="$(find pr2_guide)/credentials/pr2-guide.json" />
+    <param name="/pr2_guide/config/interaction_module/project_id"    value="pr2-guige-ketbes" />
+    <param name="/pr2_guide/config/interaction_module/session_id"    value="dialogflow-reivkr@pr2-guige-ketbes.iam.gserviceaccount.com" />
     <param name="/pr2_guide/config/interaction_module/language_code" value="ja" />
 
     <param name="/pr2_guide/topicname/status_manager/status"         value="/status_manager/status" />
@@ -15,12 +15,12 @@
     <param name="/pr2_guide/servicename/spot_manager/save"           value="/spot_manager/save" />
     <param name="/pr2_guide/servicename/status_manager/set_status"   value="/status_manager/set_status" />
 
-    <param name="/pr2_guide/topicname/speech_to_text"                value="/speech_to_text" />
+    <param name="/pr2_guide/topicname/speech_to_text"                value="/speech_to_text_app" />
     <param name="/pr2_guide/topicname/move_base/cancel"              value="/move_base/cancel" />
     <param name="/pr2_guide/actionname/robotsound_jp"                value="/robotsound_jp" />
 
-    <node pkg="pr2_guide" type="node-go-to-spot.l"        name="/pr2_guide/go_to_spot" />
-    <node pkg="pr2_guide" type="NodeInteractionModule.py" name="/pr2_guide/interaction-module" />
-    <node pkg="pr2_guide" type="NodeSpotServer.py"        name="/pr2_guide/spot_manager" />
-    <node pkg="pr2_guide" type="NodeStatusManager.py"     name="/pr2_guide/status_manager" />
+    <node pkg="pr2_guide" type="node-go-to-spot.l"        name="go_to_spot" />
+    <node pkg="pr2_guide" type="NodeInteractionModule.py" name="interaction_module" />
+    <node pkg="pr2_guide" type="NodeSpotServer.py"        name="spot_manager" />
+    <node pkg="pr2_guide" type="NodeStatusManager.py"     name="status_manager" />
 </launch>
