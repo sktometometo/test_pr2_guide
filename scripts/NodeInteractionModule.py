@@ -481,14 +481,38 @@ class InteractionModule:
             else:
                 self.speakInJapanese( fulfillment_text )
                 self.speakInJapanese( "未知のインテントが返ってきています。" )
+
+class SignalHandle:
+
+    def __init__( self ):
+
+        signal.signal( signal.SIGINT, self.handler )
+        signal.signal( signal.SIGTERM, self.handler )
+
+        self.isok = True
+
+    def handler( self, signum, frame ):
+
+        self.isok = False
         
 if __name__=="__main__":
 
     rospy.init_node( "interaction_module" )
 
-    servicename_speech_to_text_select = "/speech_to_text_demux/select"
+    # switch speech_to_text topic stream to this node
+    servicename_speech_to_text_select = "/demux/select"
     speech_to_text_demux = rospy.ServiceProxy( servicename_speech_to_text_select, DemuxSelect )
-    speech_to_text_demux( DemuxSelectRequest( "/speech_to_text_app" )
+    speech_to_text_demux( DemuxSelectRequest( "/speech_to_text_app" ) )
+    # set ros sleep rate
+    rate = rospy.Rate( 1 )
+    # create interaction module instance
     im = InteractionModule( )
+    # create signal handling class
+    sh = SignalHandle()
+    while sh.isok:
+        rate.sleep()
+    # switch speech_to_text topic stream to dialogflow client
+    speech_to_text_demux( DemuxSelectRequest( "/speech_to_text_dialogflow_client" ) )
+    # rospy shutdown
+    rospy.signal_shutdown("finish")
     rospy.spin()
-    speech_to_text_demux( DemuxSelectRequest( "/speech_to_text_dialogflow_client" )
