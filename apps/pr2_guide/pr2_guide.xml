@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find pr2_guide)/launch/pr2_guide.launch">
+  </include>
+</launch>

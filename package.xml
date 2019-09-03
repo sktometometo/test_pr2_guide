@@ -13,8 +13,9 @@
   <build_depend>message_generation</build_depend>
 
   <exec_depend>message_generation</exec_depend>
+  <exec_depend>app_manager</exec_depend>
 
   <export>
-
+    <app_manager app_dir="${prefix}/apps" />
   </export>
 </package>
