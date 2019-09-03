@@ -22,5 +22,5 @@
     <node pkg="pr2_guide" type="node-go-to-spot.l"        name="go_to_spot" />
     <node pkg="pr2_guide" type="NodeInteractionModule.py" name="interaction_module" />
     <node pkg="pr2_guide" type="NodeSpotServer.py"        name="spot_manager" />
-    <node pkg="pr2_guide" type="NodeStatusManager.py"     name="status_manager" />
+    <node pkg="pr2_guide" type="NodeStatusManager.py"     name="status_manager" required="true" />
 </launch>
