@@ -230,6 +230,7 @@ class InteractionModule:
 
             elif intent_name == "command : abort":
                 rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
+                self.setStatus( "aborting" )
 
             elif intent_name == "command : add_spot":
                 rospy.loginfo( "intent_name : " + intent_name + ", do nothing." )
