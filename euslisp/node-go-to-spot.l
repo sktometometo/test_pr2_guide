@@ -63,6 +63,12 @@
                )
             (setq target-spot (send req :target_spot))
             (setq spots (send (ros::service-call servicename-spot-manager-get get-request) :spots))
+            (if (eq spots nil)
+                (progn
+                    (print "target spot has not been found.")
+                    (return-from ':service-cb-start)
+                    )
+                nil)
             (print (send (elt spots 0) :name))
             (print target-spot)
 
