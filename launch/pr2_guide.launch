@@ -1,11 +1,12 @@
 <launch>
-    <param name="/pr2_guide/filename/spot_manager/config"            value="$(find pr2_guide)/config/spotserver.pickle" />
+    <param name="/pr2_guide/filename/spot_manager/config"            value="$(find pr2_guide)/yaml/spotserver.yaml" />
     <param name="/pr2_guide/filename/interaction_module/credential"  value="" />
     <param name="/pr2_guide/config/interaction_module/project_id"    value="" />
     <param name="/pr2_guide/config/interaction_module/session_id"    value="" />
     <param name="/pr2_guide/config/interaction_module/language_code" value="ja" />
 
     <param name="/pr2_guide/topicname/status_manager/status"         value="/status_manager/status" />
+    <param name="/pr2_guide/topicname/spot_manager/markers"          value="/spot_manager/markers" />
     <param name="/pr2_guide/servicename/go_to_spot/start"            value="/go_to_spot/start" />
     <param name="/pr2_guide/servicename/go_to_spot/cancel"           value="/go_to_spot/cancel" />
     <param name="/pr2_guide/servicename/spot_manager/add"            value="/spot_manager/add" />
@@ -16,6 +17,7 @@
 
     <param name="/pr2_guide/topicname/speech_to_text"                value="/speech_to_text" />
     <param name="/pr2_guide/topicname/move_base/cancel"              value="/move_base/cancel" />
+    <param name="/pr2_guide/actionname/robotsound_jp"                value="/robotsound_jp" />
 
     <node pkg="pr2_guide" type="node-go-to-spot.l"        name="/pr2_guide/go_to_spot" />
     <node pkg="pr2_guide" type="NodeInteractionModule.py" name="/pr2_guide/interaction-module" />

@@ -14,6 +14,7 @@ from pr2_guide.msg import *
 from std_msgs.msg import *
 from speech_recognition_msgs.msg import *
 from sound_play.msg import *
+from topic_tools.srv import *
 
 import dialogflow_v2 as dialogflow
 
@@ -24,8 +25,6 @@ class InteractionModule:
     def __init__( self ):
         # ROS
         ##
-        self.nodename                              = "interaction_module"
-        rospy.init_node( self.nodename )
 
         ##
         self.topicname_status_manager_status       = rospy.get_param( "/pr2_guide/topicname/status_manager/status",
@@ -485,5 +484,11 @@ class InteractionModule:
         
 if __name__=="__main__":
 
+    rospy.init_node( "interaction_module" )
+
+    servicename_speech_to_text_select = "/speech_to_text_demux/select"
+    speech_to_text_demux = rospy.ServiceProxy( servicename_speech_to_text_select, DemuxSelect )
+    speech_to_text_demux( DemuxSelectRequest( "/speech_to_text_app" )
     im = InteractionModule( )
     rospy.spin()
+    speech_to_text_demux( DemuxSelectRequest( "/speech_to_text_dialogflow_client" )
