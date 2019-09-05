@@ -11,6 +11,7 @@ import rospy
 from pr2_guide.msg import *
 from pr2_guide.srv import *
 from std_msgs.msg import *
+from topic_tools.srv import *
 
 def main():
     # rospy initialization

@@ -6,6 +6,7 @@ import sys
 import rospy
 import pickle
 import yaml
+import hashlib
 from pr2_guide.srv import *
 from pr2_guide.msg import *
 from visualization_msgs.msg import *
@@ -54,11 +55,8 @@ class SpotServer:
             rospy.loginfo( self.filepath + " does not exist." )
         rospy.loginfo( "initialize finished." )
 
-    def __del__( self ):
-        self.save_spotlist( self.filepath )
-
     def load_spotlist( self, filepath ):
-        if self.filepath is None:
+        if filepath is None:
             return False
         if os.path.exists( os.path.abspath( filepath ) ):
             with open( filepath, "r" ) as f:
@@ -118,7 +116,7 @@ class SpotServer:
         self.publisher_markers( msg )
 
     def save_spotlist( self, filepath ):
-        if self.filepath is None:
+        if filepath is None:
             return False
         else:
             with open( filepath, "w" ) as f:
