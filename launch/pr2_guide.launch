@@ -19,8 +19,8 @@
     <param name="/pr2_guide/topicname/move_base/cancel"              value="/move_base/cancel" />
     <param name="/pr2_guide/actionname/robotsound_jp"                value="/robotsound_jp" />
 
-    <node pkg="pr2_guide" type="node-go-to-spot.l"        name="go_to_spot" />
-    <node pkg="pr2_guide" type="NodeInteractionModule.py" name="interaction_module" />
-    <node pkg="pr2_guide" type="NodeSpotServer.py"        name="spot_manager" />
-    <node pkg="pr2_guide" type="NodeStatusManager.py"     name="status_manager" required="true" />
+    <node pkg="pr2_guide" type="node-go-to-spot.l"        output="screen" name="go_to_spot" />
+    <node pkg="pr2_guide" type="NodeInteractionModule.py" output="screen" name="interaction_module" />
+    <node pkg="pr2_guide" type="NodeSpotServer.py"        output="screen" name="spot_manager" />
+    <node pkg="pr2_guide" type="NodeStatusManager.py"     output="screen" name="status_manager" required="true" />
 </launch>
