@@ -35,17 +35,17 @@
         (ros::advertise topicname-movebase-cancel actionlib_msgs::GoalID 1)
         (ros::subscribe topicname-movebase-result move_base_msgs::MoveBaseActionResult #'send self :subscriber-cb-checking-goal)
         ;;
-        (print "initialization finished")
+        (ros::ros-info "initialization finished")
         )
 
     (:subscriber-cb-checking-goal (msg)
-        (print "checking goal cb is called")
+        (ros::ros-info "checking goal subscriber callback is called")
         (send self :set-status "waiting-interaction")
-        (print (send (send msg :status) :text))
+        (ros::ros-info "result text is ~A" (send (send msg :status) :text))
         )
 
     (:set-status (status)
-        (print "set-status is called")
+        (ros::ros-info "set-status function is called")
         (let* ((req (instance pr2_guide::StatusManagerSetStatusRequest :init))
                ret
                )
@@ -55,7 +55,7 @@
         )
 
     (:service-cb-start (req)
-        (print "start service is called")
+        (ros::ros-info "start service is called")
         (let* ((get-request (instance pr2_guide::SpotManagerGetRequest :init))
                (spots nil)
                (res (send req :response))
@@ -63,14 +63,13 @@
                )
             (setq target-spot (send req :target_spot))
             (setq spots (send (ros::service-call servicename-spot-manager-get get-request) :spots))
+            (ros::ros-info "target spot is ~A" target-spot)
             (if (eq spots nil)
                 (progn
-                    (print "target spot has not been found.")
-                    (return-from ':service-cb-start)
+                    (ros::ros-info "target spot has not been found.")
+                    (return-from :service-cb-start)
                     )
                 nil)
-            (print (send (elt spots 0) :name))
-            (print target-spot)
 
             (dolist (x spots)
                 (if (equal (send x :name) target-spot)
@@ -82,7 +81,7 @@
                 )
             (if (equal goal-pose nil)
                 (progn
-                    (print "failed..")
+                    (ros::ros-info "go-to-spot-start service has failed.")
                     (send res :ret nil)
                     res
                     )
@@ -90,8 +89,7 @@
                     (send (send goal-pose :position) :z 0)
                     (setq goal-pose (ros::tf-pose->coords goal-pose))
                     (send *ri* :move-to goal-pose :frame-id frame-id :no-wait t)
-                    (print "move_base action is called")
-                    (print goal-pose)
+                    (ros::ros-info "move_base action has been successfully called with coordinate ~A." goal-pose)
                     (send res :ret t)
                     res
                     )
@@ -100,7 +98,7 @@
         )
 
     (:service-cb-stop (req)
-        (print "stop service is called")
+        (ros::ros-info "go-to-spot-stop service is called")
         (let* ((msg (instance actionlib_msgs::GoalID :init))
                (res (send req :response))
                )
