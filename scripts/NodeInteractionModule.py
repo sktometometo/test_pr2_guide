@@ -23,9 +23,22 @@ import threading
 class InteractionModule:
 
     def __init__( self ):
-        # ROS
-        ##
+        # member variables initialization for status management
+        self.status = "default"
+        self.statushandlers = {
+                                "default":                  self.statushandler_default,
+                                "waiting":                  self.statushandler_waiting,
+                                "waiting_interaction":      self.statushandler_waiting_interaction,
+                                "guiding":                  self.statushandler_guiding,
+                                "guiding_halt_waiting":     self.statushandler_guiding_halt_waiting,
+                                "guiding_halt_interaction": self.statushandler_guiding_halt_interaction,
+                              }
+        self.statushandlerthread = None
+        self.isok = False
+        self.buffer_text = []
+        self.target_spot_stack = []
 
+        # ROS
         ##
         self.topicname_status_manager_status       = rospy.get_param( "/pr2_guide/topicname/status_manager/status",
                                                                      "/status_manager/status" )
@@ -58,21 +71,6 @@ class InteractionModule:
         self.credential_file       = rospy.get_param( "/pr2_guide/filename/interaction_module/credential" )
         self.dialogflow_project_id = rospy.get_param( "/pr2_guide/config/interaction_module/project_id" )
         self.dialogflow_session_id = rospy.get_param( "/pr2_guide/config/interaction_module/session_id" )
-
-        # member variables initialization for status management
-        self.status = "default"
-        self.statushandlers = {
-                                "default":                  self.statushandler_default,
-                                "waiting":                  self.statushandler_waiting,
-                                "waiting_interaction":      self.statushandler_waiting_interaction,
-                                "guiding":                  self.statushandler_guiding,
-                                "guiding_halt_waiting":     self.statushandler_guiding_halt_waiting,
-                                "guiding_halt_interaction": self.statushandler_guiding_halt_interaction,
-                              }
-        self.statushandlerthread = None
-        self.isok = False
-        self.buffer_text = []
-        self.target_spot_stack = []
 
         # dialog flow
         ## os enviromental variable
