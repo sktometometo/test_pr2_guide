@@ -91,13 +91,22 @@ class InteractionModule:
 
     def speakInJapanese( self, text ):
         #TBD
-        rospy.loginfo( "Speaking : " + text.encode( "utf-8" ) )
         msg = SoundRequest(
                     command = SoundRequest.PLAY_ONCE,
                     sound = SoundRequest.SAY,
                     volume = 1.0,
-                    arg = text,
+                    arg = "",
                     arg2 = "ja" )
+        if type( text ) is str:
+            rospy.loginfo( "Speaking : " + text )
+            msg.arg = text
+        elif type( text ) is unicode:
+            rospy.loginfo( "Speaking : " + text.encode( "utf-8" ) )
+            msg.arg = text.encode( "utf-8" )
+        else:
+            rospy.loginfo( "Speaking : " + "unknown string object" )
+            return
+
         self.actionclient_robotsound_jp.send_goal_and_wait( SoundRequestGoal( sound_request=msg ), rospy.Duration( 10.0 ) )
 
     def isaliveStatusHandler( self ):
