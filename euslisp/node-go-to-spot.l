@@ -66,7 +66,7 @@
             (ros::ros-info "target spot is ~A" target-spot)
             (if (eq spots nil)
                 (progn
-                    (ros::ros-info "target spot has not been found.")
+                    (ros::ros-info "There is no spot data.")
                     (return-from :service-cb-start)
                     )
                 nil)
@@ -81,6 +81,7 @@
                 )
             (if (equal goal-pose nil)
                 (progn
+                    (ros::ros-info "target spot has not been found.")
                     (ros::ros-info "go-to-spot-start service has failed.")
                     (send res :ret nil)
                     res
