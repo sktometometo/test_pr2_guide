@@ -11,18 +11,33 @@ from pr2_guide.srv import *
 from pr2_guide.msg import *
 from visualization_msgs.msg import *
 
-def str2unicode_in_yaml( yamldata ):
-
+def strobj2unicode_in_yaml( yamldata ):
     if type( yamldata ) == list:
-        return map( str2unicode_in_yaml, yamldata )
+        return map( strobj2unicode_in_yaml, yamldata )
     elif type( yamldata ) == dict:
-        return dict( [ (key, str2unicode_in_yaml( val )) for key,val in yamldata.items() ]  )
-    #elif type( yamldata ) == str:
-    #    return yamldata.decode( "utf-8" )
-    elif type( yamldata ) == unicode:
-        return yamldata.encode( "utf-8" )
+        return dict( [ (key, strobj2unicode_in_yaml( val )) for key,val in yamldata.items() ]  )
     else:
-        return yamldata
+        return strobj2unicode( yamldata )
+
+def strobj2byte_in_yaml( yamldata ):
+    if type( yamldata ) == list:
+        return map( strobj2byte_in_yaml, yamldata )
+    elif type( yamldata ) == dict:
+        return dict( [ (strobj2byte( key ), strobj2byte_in_yaml( val )) for key,val in yamldata.items() ]  )
+    else:
+        return strobj2byte( yamldata )
+
+def strobj2byte( string ):
+    if type( string ) is unicode:
+        return string.encode( "utf-8" )
+    else:
+        return string
+
+def strobj2unicode( string ):
+    if type( string ) is str:
+        return string.decode( "utf-8" )
+    else:
+        return string
 
 class SpotServer:
 
@@ -38,12 +53,6 @@ class SpotServer:
         self.servicename_save   = rospy.get_param( "/pr2_guide/servicename/spot_manager/save",   "/spot_manager/save" ) 
         self.topicname_markers  = rospy.get_param( "/pr2_guide/topicname/spot_manager/markers",  "/spot_manager/markers" )
         ##
-        self.service_add    = rospy.Service( self.servicename_add,    SpotManagerAdd,    self.servicehandler_add )
-        self.service_delete = rospy.Service( self.servicename_delete, SpotManagerDelete, self.servicehandler_delete )
-        self.service_get    = rospy.Service( self.servicename_get,    SpotManagerGet,    self.servicehandler_get )
-        self.service_save   = rospy.Service( self.servicename_save,   SpotManagerSave,   self.servicehandler_save )
-        self.publisher_markers = rospy.Publisher( self.topicname_markers, MarkerArray, queue_size=1 )
-        ##
         rospy.Rate(1)
         # SpotManager
         self.spotlist = {}
@@ -53,6 +62,13 @@ class SpotServer:
             self.load_spotlist( self.filepath )
         else:
             rospy.loginfo( self.filepath + " does not exist." )
+        ##
+        self.service_add    = rospy.Service( self.servicename_add,    SpotManagerAdd,    self.servicehandler_add )
+        self.service_delete = rospy.Service( self.servicename_delete, SpotManagerDelete, self.servicehandler_delete )
+        self.service_get    = rospy.Service( self.servicename_get,    SpotManagerGet,    self.servicehandler_get )
+        self.service_save   = rospy.Service( self.servicename_save,   SpotManagerSave,   self.servicehandler_save )
+        self.publisher_markers = rospy.Publisher( self.topicname_markers, MarkerArray, queue_size=1 )
+        ##
         rospy.loginfo( "initialize finished." )
 
     def load_spotlist( self, filepath ):
@@ -61,23 +77,23 @@ class SpotServer:
         if os.path.exists( os.path.abspath( filepath ) ):
             with open( filepath, "r" ) as f:
                 yamldata = yaml.load( f, Loader=yaml.SafeLoader )
-                yamldata = str2unicode_in_yaml( yamldata )
+                yamldata = strobj2byte_in_yaml( yamldata )
                 tempspotlist = yamldata["spots"]
-
                 if type( tempspotlist ) == dict:
                     self.spotlist = tempspotlist
-
                 elif type( tempspotlist ) == list:
                     self.spotlist = {}
                     for x in tempspotlist:
                         self.spotlist[x["name"]] = x
-
+                else:
+                    self.spotlist = {}
+                    rospy.logerr( "unknown yaml files" )
+                    return False
             return True
         else:
             return False
 
     def hash_str2int32( self, string ):
-
         return int( "0X" + hashlib.md5( string ).hexdigest()[:4] , 0 )
 
     def delete_markerarray_spotlist( self ):
@@ -124,7 +140,9 @@ class SpotServer:
             return True
 
     def yaml2spot( self, yamled_spot ):
-        if "header" not in yamled_spot.keys() \
+        if type( yamled_spot ) is not dict:
+            return None
+        elif "header" not in yamled_spot.keys() \
             or "name" not in yamled_spot.keys() \
             or "aliases" not in yamled_spot.keys() \
             or "pose" not in yamled_spot.keys() :
@@ -174,6 +192,7 @@ class SpotServer:
         ## spotlist
         spot = req.spot
         if spot.name in self.spotlist.keys():
+            rospy.loginfo( "add service failed" )
             return SpotManagerAddResponse( False )
         yamlspot = self.spot2yaml( spot )
         self.spotlist[ spot.name ] = yamlspot
@@ -219,7 +238,8 @@ class SpotServer:
 
     def servicehandler_get( self, req ):
         rospy.loginfo( "get service called" )
-        return SpotManagerGetResponse( map( self.yaml2spot, list( self.spotlist.values() ) ) )
+        ret = map( self.yaml2spot, list( self.spotlist.values() ) )
+        return SpotManagerGetResponse( ret )
 
     def servicehandler_save( self, req ):
         rospy.loginfo( "save service called" )
