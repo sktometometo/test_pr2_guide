@@ -26,6 +26,7 @@ def main():
     rate = rospy.Rate(1)
     while sm.isok:
         rate.sleep()
+    rospy.loginfo( "pr2_guide is exiting...." )
     # switch speetch_to_text topic steam to /speech_to_text_dialogflow_client
     speech_to_text_demux( DemuxSelectRequest( "/speech_to_text_dialogflow_client" ) )
     # rospy shutdown
