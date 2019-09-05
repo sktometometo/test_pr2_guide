@@ -1,14 +1,14 @@
 spots:
-  73A1:
+  "7 3 A 1":
     aliases:
-    - 73A1
+    - "7 3 A 1"
     header:
       frame_id: map
       seq: 0
       stamp:
         nsecs: 0
         secs: 0
-    name: 73A1
+    name: "7 3 A 1"
     pose:
       orientation:
         w: 0.940086765938
@@ -19,16 +19,16 @@ spots:
         x: -1.7376410056
         y: 0.22225253559
         z: 0.051
-  73A2:
+  "7 3 A 2":
     aliases:
-    - 73A2
+    - "7 3 A 2"
     header:
       frame_id: map
       seq: 0
       stamp:
         nsecs: 0
         secs: 0
-    name: 73A2
+    name: "7 3 A 2"
     pose:
       orientation:
         w: 0.936249347706
@@ -39,16 +39,16 @@ spots:
         x: -1.72266309279
         y: 3.62246813913
         z: 0.051
-  73B2:
+  "7 3 B 2":
     aliases:
-    - 73B2
+    - "7 3 B 2"
     header:
       frame_id: map
       seq: 0
       stamp:
         nsecs: 0
         secs: 0
-    name: 73B2
+    name: "7 3 B 2"
     pose:
       orientation:
         w: 0.934389037044
