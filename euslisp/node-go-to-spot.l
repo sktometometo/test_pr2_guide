@@ -1,11 +1,21 @@
 #!/usr/bin/env roseus
 
-(load "package://pr2eus/pr2-interface.l")
+(ros::roseus "go-to-spot")
+
+(setq *robottype* (ros::get-param "/robot/name"))
+
+(cond ((eql *robottype* "pr2")
+        (load "package://pr2eus/pr2-interface.l")
+        (setq *ri* (instance pr2-interface :init))
+        )
+      ((eql *robottype* "fetch")
+        (load "package://fetcheus/fetch-interface.l")
+        (setq *ri* (instance fetch-interface :init))
+        )
+      )
 
 (ros::load-ros-manifest "move_base_msgs")
 (ros::load-ros-manifest "pr2_guide")
-
-(ros::roseus "go-to-spot")
 
 (defclass go-to-spot-server
     :slots (
@@ -20,8 +30,6 @@
 
 (defmethod go-to-spot-server
     (:init ()
-        ;;
-        (setq *ri* (instance pr2-interface :init))
         ;;
         (setq topicname-movebase-cancel             (ros::get-param "/pr2_guide/topicname/move_base/cancel"            "/move_base/cancel"))
         (setq topicname-movebase-result             (ros::get-param "/pr2_guide/topicname/move_base/result"            "/move_base/result"))
